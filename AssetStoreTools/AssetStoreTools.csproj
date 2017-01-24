@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{2D609DFC-C51E-4172-AF19-2F9022F1C691}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>Library</OutputType>
+    <AssemblyName>AssetStoreTools</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="UnityEditor">
+      <HintPath>C:\Program Files\Unity\Editor\Data\Managed\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssetBundler3.cs" />
+    <Compile Include="AssetBundlerFactory.cs" />
+    <Compile Include="AssetStoreAPI.cs" />
+    <Compile Include="AssetStoreClient.cs" />
+    <Compile Include="AssetStoreManager.cs" />
+    <Compile Include="AssetStorePackageController.cs" />
+    <Compile Include="AssetStorePublisher.cs" />
+    <Compile Include="AssetStoreResponse.cs" />
+    <Compile Include="AssetStoreWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DebugUtils.cs" />
+    <Compile Include="DefaultListViewGUI.cs" />
+    <Compile Include="FileSelector.cs" />
+    <Compile Include="GUIUtil.cs" />
+    <Compile Include="IAssetBundler.cs" />
+    <Compile Include="IDataSource.cs" />
+    <Compile Include="IListViewGUI.cs" />
+    <Compile Include="Image.cs" />
+    <Compile Include="ImageCache.cs" />
+    <Compile Include="JSONParseException.cs" />
+    <Compile Include="JSONParser.cs" />
+    <Compile Include="JSONTypeException.cs" />
+    <Compile Include="JSONValue.cs" />
+    <Compile Include="LabelList.cs" />
+    <Compile Include="ListView.cs" />
+    <Compile Include="LoginWindow.cs" />
+    <Compile Include="MainAssetsUploadHelper.cs" />
+    <Compile Include="MainAssetsUtil.cs" />
+    <Compile Include="MassLabeler.cs" />
+    <Compile Include="Package.cs" />
+    <Compile Include="PackageDataSource.cs" />
+    <Compile Include="PackageListGUI.cs" />
+    <Compile Include="Packager.cs" />
+    <Compile Include="PackageSelector.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnityEditor\AssetServer.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
