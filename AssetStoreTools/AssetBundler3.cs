@@ -11,13 +11,17 @@ public class AssetBundler3 : IAssetBundler
 
 	public bool CanGenerateBundles()
 	{
-		return PlayerSettings.advancedLicense;
+        return false; // old code: PlayerSettings.advancedLicense;
 	}
 
 	public bool CreateBundle(UnityEngine.Object asset, string targetPath)
-	{
-		return BuildPipeline.BuildAssetBundle(asset, null, targetPath, (BuildAssetBundleOptions)1048576);
-	}
+    {
+        // BuildPipeline.BuildAssetBundle is obsolete and this AssetBundler is just a fallback.
+        // So we can just say "no".
+        return false; 
+
+       // return BuildPipeline.BuildAssetBundle(asset, null, targetPath, (BuildAssetBundleOptions)1048576);
+    }
 
 	public void Preview(string assetpath)
 	{
