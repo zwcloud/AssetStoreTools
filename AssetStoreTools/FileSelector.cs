@@ -172,7 +172,7 @@ public class FileSelector : EditorWindow
 			{
 				GUILayout.Height(21f)
 			});
-			GUILayout.FlexibleSpace();
+			//GUILayout.FlexibleSpace();
 		}
 	}
 
@@ -279,16 +279,37 @@ public class FileSelector : EditorWindow
 		return linkedList;
 	}
 
-    void SelectNode(FileNode fileNode)
+    void SelectNode(FileNode fileNode, bool select = true)
     {
-        if (!fileNode.isDirectory)
+        if (!fileNode.isDirectory && fileNode.Selected != select)
         {
-            this.m_SelectedFiles.AddLast(fileNode);
-            fileNode.Selected = true;
+            if (select)
+                this.m_SelectedFiles.AddLast(fileNode);
+            else
+                this.m_SelectedFiles.Remove(fileNode);
+
+            fileNode.Selected = select;
         }
+
         foreach (var node in fileNode.Childrens)
         {
-            SelectNode(node);
+            SelectNode(node, select);
+        }
+    }
+
+    void ExpandNode(FileNode fileNode, bool expand)
+    {
+        if (!(fileNode.isDirectory))
+            return;
+
+        fileNode.Expanded = expand;
+
+        foreach (var node in fileNode.Childrens)
+        {
+            if (node.isDirectory)
+            {
+                ExpandNode(node, expand);
+            }
         }
     }
 
@@ -297,15 +318,27 @@ public class FileSelector : EditorWindow
 		LinkedList<FileSelector.FileNode> linkedList = new LinkedList<FileSelector.FileNode>();
 		linkedList.AddFirst(this.m_RootDir);
         LinkedList<FileSelector.FileNode> linkedList2 = new LinkedList<FileSelector.FileNode>();
-        if (GUILayout.Button("Select all"))
+
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Expand all"))
         {
-            this.m_SelectedFiles.Clear();
             foreach (var fileNode in linkedList)
             {
-                SelectNode(fileNode);
+                ExpandNode(fileNode, true);
             }
         }
-		while (linkedList.Count > 0)
+
+        if (GUILayout.Button("Collapse all"))
+        {
+            foreach (var fileNode in linkedList)
+            {
+                ExpandNode(fileNode, false);
+            }
+        }
+
+        GUILayout.EndHorizontal();
+
+        while (linkedList.Count > 0)
 		{
 			LinkedListNode<FileSelector.FileNode> first = linkedList.First;
 			linkedList2.Clear();
@@ -313,8 +346,8 @@ public class FileSelector : EditorWindow
 			GUILayout.Space((float)(20 * first.Value.Depth));
 			if (first.Value.isDirectory)
 			{
-				GUIStyle style = "IN foldout";
-				first.Value.Expanded = GUILayout.Toggle(first.Value.Expanded, GUIContent.none, style);
+                GUIStyle style = "IN foldout";
+                first.Value.Expanded = GUILayout.Toggle(first.Value.Expanded, GUIContent.none, style);
 			}
 			else
 			{
@@ -332,8 +365,25 @@ public class FileSelector : EditorWindow
 					first.Value.Selected = flag;
 				}
 			}
-			first.Value.RenderIconText();
-			GUILayout.EndHorizontal();
+
+            first.Value.RenderIconText();
+
+            if (first.Value.isDirectory)
+            {
+                if (GUILayout.Button("+"))
+                {
+                    SelectNode(first.Value, true);
+                }
+
+                if (GUILayout.Button("-"))
+                {
+                    SelectNode(first.Value, false);
+                }
+            }
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.EndHorizontal();
 			if (first.Value.Expanded)
 			{
 				foreach (FileSelector.FileNode current in first.Value.SubDirectories)
@@ -362,7 +412,9 @@ public class FileSelector : EditorWindow
 			GUILayout.BeginHorizontal(new GUILayoutOption[0]);
 			value.Selected = GUILayout.Toggle(value.Selected, GUIContent.none, new GUILayoutOption[0]);
 			value.RenderIconText();
-			if (MainAssetsUtil.CanPreview && GUILayout.Button("Preview", new GUILayoutOption[0]))
+            GUILayout.FlexibleSpace();
+
+            if (MainAssetsUtil.CanPreview && GUILayout.Button("Preview", new GUILayoutOption[0]))
 			{
 				MainAssetsUtil.Preview(value.Name);
 			}
@@ -385,7 +437,13 @@ public class FileSelector : EditorWindow
 		int num = (int)Math.Floor((double)(base.position.width / 2f));
 		GUILayout.BeginVertical(new GUILayoutOption[0]);
 		GUILayout.Label("Main Assets", EditorStyles.boldLabel, new GUILayoutOption[0]);
-		GUILayout.Label("Please select from the list below the main assets in your package. You should select items that you consider to be the central parts of you package, and that would showcase your package. The Asset Store will generate previews for the selected items. If you are uploading a Character, the Character prefab would be a good candidate for instance", EditorStyles.wordWrappedLabel, new GUILayoutOption[0]);
+        GUILayout.Label(
+@"Please select from the list below the main assets in your package. 
+You should select items that you consider to be the central parts of your package, and that would showcase your package.
+The Asset Store will generate previews for the selected items. 
+If you are uploading a Character, the Character prefab would be a good candidate for instance",
+            EditorStyles.wordWrappedLabel, new GUILayoutOption[0]);
+
 		GUILayout.BeginHorizontal(new GUILayoutOption[0]);
 		GUILayout.BeginVertical(new GUILayoutOption[]
 		{
