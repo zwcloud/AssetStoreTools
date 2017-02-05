@@ -1,11 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26127.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetStoreTools", "AssetStoreTools\AssetStoreTools.csproj", "{2D609DFC-C51E-4172-AF19-2F9022F1C691}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AssetStoreTools", "src\AssetStoreTools.shproj", "{882E1CC8-B375-47C7-AFB0-39428147D964}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{76B5C487-6359-4225-B0A9-EC5EDC351DF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "5.0.0", "build\5.0.0\5.0.0.csproj", "{2D609DFC-C51E-4172-AF19-2F9022F1C691}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BD898B46-A602-4932-83D9-EA2267B6FF69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "5.3.0", "build\5.3.0\5.3.0.csproj", "{0274F599-D9E9-4460-A3B4-A4D0BC1CF15C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "5.4.0", "build\5.4.0\5.4.0.csproj", "{BAD419F3-5382-43C0-93B1-335F626A09FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "5.5.0", "build\5.5.0\5.5.0.csproj", "{FD7E4454-1367-4CA2-B2DC-670F75A4045B}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\AssetStoreTools.projitems*{0274f599-d9e9-4460-a3b4-a4d0bc1cf15c}*SharedItemsImports = 4
+		src\AssetStoreTools.projitems*{2d609dfc-c51e-4172-af19-2f9022f1c691}*SharedItemsImports = 4
+		src\AssetStoreTools.projitems*{882e1cc8-b375-47c7-afb0-39428147d964}*SharedItemsImports = 13
+		src\AssetStoreTools.projitems*{bad419f3-5382-43c0-93b1-335f626a09fa}*SharedItemsImports = 4
+		src\AssetStoreTools.projitems*{fd7e4454-1367-4ca2-b2dc-670f75a4045b}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -15,8 +34,27 @@ Global
 		{2D609DFC-C51E-4172-AF19-2F9022F1C691}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D609DFC-C51E-4172-AF19-2F9022F1C691}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D609DFC-C51E-4172-AF19-2F9022F1C691}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0274F599-D9E9-4460-A3B4-A4D0BC1CF15C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0274F599-D9E9-4460-A3B4-A4D0BC1CF15C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0274F599-D9E9-4460-A3B4-A4D0BC1CF15C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0274F599-D9E9-4460-A3B4-A4D0BC1CF15C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAD419F3-5382-43C0-93B1-335F626A09FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAD419F3-5382-43C0-93B1-335F626A09FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAD419F3-5382-43C0-93B1-335F626A09FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAD419F3-5382-43C0-93B1-335F626A09FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD7E4454-1367-4CA2-B2DC-670F75A4045B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD7E4454-1367-4CA2-B2DC-670F75A4045B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD7E4454-1367-4CA2-B2DC-670F75A4045B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD7E4454-1367-4CA2-B2DC-670F75A4045B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{882E1CC8-B375-47C7-AFB0-39428147D964} = {BD898B46-A602-4932-83D9-EA2267B6FF69}
+		{2D609DFC-C51E-4172-AF19-2F9022F1C691} = {76B5C487-6359-4225-B0A9-EC5EDC351DF3}
+		{0274F599-D9E9-4460-A3B4-A4D0BC1CF15C} = {76B5C487-6359-4225-B0A9-EC5EDC351DF3}
+		{BAD419F3-5382-43C0-93B1-335F626A09FA} = {76B5C487-6359-4225-B0A9-EC5EDC351DF3}
+		{FD7E4454-1367-4CA2-B2DC-670F75A4045B} = {76B5C487-6359-4225-B0A9-EC5EDC351DF3}
 	EndGlobalSection
 EndGlobal
