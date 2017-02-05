@@ -23,7 +23,8 @@ public class AssetBundler4 : IAssetBundler
 
 	public void Preview(string assetpath)
 	{
-		string path = MainAssetsUtil.CreateBundle(assetpath);
+#if UNITY_5_4_0 || UNITY_5_5_0
+        string path = MainAssetsUtil.CreateBundle(assetpath);
 		AssetStoreAsset assetStoreAsset = new AssetStoreAsset();
 		assetStoreAsset.name = "Preview";
 		byte[] binary = File.ReadAllBytes(path);
@@ -45,5 +46,6 @@ public class AssetBundler4 : IAssetBundler
 		AssetStoreToolUtils.PreviewAssetStoreAssetBundleInInspector(assetBundle, assetStoreAsset);
 		assetBundle.Unload(false);
 		File.Delete(path);
-	}
+#endif
+    }
 }
