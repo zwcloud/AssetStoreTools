@@ -490,7 +490,7 @@ internal class AssetStorePackageController
 			}
 			return;
 		}
-		if (MainAssetsUtil.CanGenerateBundles)
+		if (false/*MainAssetsUtil.CanGenerateBundles*/)
 		{
 			this.UploadAssetBundles();
 		}
