@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AssetStorePublisher.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AssetStoreResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AssetStoreWebClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BackwardsCompatibilityUtility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DefaultListViewGUI.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSelector.cs" />

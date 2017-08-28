@@ -1,47 +1,63 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
-using UnityEditor;
 
 internal static class Packager
 {
 	internal static string[] CollectAllChildren(string guid, string[] collection)
 	{
-		return AssetServer.CollectAllChildren(guid, collection);
-	}
-
-	internal static string GetRootGUID()
-	{
-		return AssetServer.GetRootGUID();
+		List<string> methods = new List<string>
+		{
+			"UnityEditor.AssetDatabase.CollectAllChildren",
+			"UnityEditor.AssetServer.CollectAllChildren"
+		};
+		return (string[])BackwardsCompatibilityUtility.TryStaticInvoke(methods, new object[]
+		{
+			guid,
+			collection
+		});
 	}
 
 	internal static void ExportPackage(string[] guids, string fileName)
 	{
-		Assembly assembly = Assembly.Load("UnityEditor");
-		Type type = assembly.GetType("UnityEditor.AssetServer");
-		MethodInfo method = type.GetMethod("ExportPackage", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-		if (method == null)
+		List<string> methods = new List<string>
 		{
-			type = assembly.GetType("PackageUtility");
-			if (type != null)
-			{
-				method = type.GetMethod("ExportPackage", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-			}
-		}
-		if (method != null)
+			"UnityEditor.PackageUtility.ExportPackage",
+			"UnityEditor.AssetServer.ExportPackage"
+		};
+		object[] parameters = new object[]
 		{
-			object[] parameters = new object[]
-			{
-				guids,
-				fileName
-			};
-			method.Invoke(null, parameters);
-			return;
-		}
-		throw new MissingMethodException("Packager", "ExportPackage");
+			guids,
+			fileName
+		};
+		BackwardsCompatibilityUtility.TryStaticInvoke(methods, parameters);
 	}
 
-	internal static AssetsItem[] BuildExportPackageAssetListAssetsItems(string[] guids, bool dependencies)
+	internal static string[] BuildExportPackageAssetListGuids(string[] guids, bool dependencies)
 	{
-		return AssetServer.BuildExportPackageAssetListAssetsItems(guids, dependencies);
+		List<string> methods = new List<string>
+		{
+			"UnityEditor.PackageUtility.BuildExportPackageItemsList",
+			"UnityEditor.AssetServer.BuildExportPackageAssetListAssetsItems"
+		};
+		MethodInfo methodInfo = BackwardsCompatibilityUtility.GetMethodInfo(methods, new Type[]
+		{
+			typeof(string[]),
+			typeof(bool)
+		});
+		object[] parameters = new object[]
+		{
+			guids,
+			dependencies
+		};
+		object[] array = (object[])methodInfo.Invoke(null, parameters);
+		string[] array2 = new string[array.Length];
+		FieldInfo field = methodInfo.ReturnType.GetElementType().GetField("guid");
+		for (int i = 0; i < array.Length; i++)
+		{
+			string text = (string)field.GetValue(array[i]);
+			array2[i] = text;
+		}
+		return array2;
 	}
 }

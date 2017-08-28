@@ -387,48 +387,48 @@ internal class AssetStorePackageController
 		return AssetDatabase.AssetPathToGUID(path);
 	}
 
-	private string[] GetGUIDS(bool includeProjectSettings)
-	{
-		string[] collection = new string[0];
-		string text = ("Assets" + (this.m_LocalRootPath ?? string.Empty)).Trim(new char[]
-		{
-			'/'
-		});
-		string guid = AssetDatabase.AssetPathToGUID(text);
-		string[] guids = Packager.CollectAllChildren(guid, collection);
-		AssetsItem[] array = Packager.BuildExportPackageAssetListAssetsItems(guids, true);
-		List<string> list = new List<string>();
-		string value = text.ToLower();
-		AssetsItem[] array2 = array;
-		for (int i = 0; i < array2.Length; i++)
-		{
-			AssetsItem assetsItem = array2[i];
-			string text2 = AssetDatabase.GUIDToAssetPath(assetsItem.guid).ToLower();
-			if (text2.StartsWith("assets/plugins") || text2.Contains("standard assets") || text2.StartsWith(value))
-			{
-				list.Add(assetsItem.guid);
-			}
-		}
-		if (includeProjectSettings)
-		{
-			string[] files = Directory.GetFiles("ProjectSettings");
-			string[] array3 = files;
-			for (int j = 0; j < array3.Length; j++)
-			{
-				string path = array3[j];
-				string text3 = AssetDatabase.AssetPathToGUID(path);
-				if (text3.Length > 0)
-				{
-					list.Add(text3);
-				}
-			}
-		}
-		string[] array4 = new string[list.Count];
-		list.CopyTo(array4);
-		return array4;
-	}
+    private string[] GetGUIDS(bool includeProjectSettings)
+    {
+        string[] collection = new string[0];
+        string text = ("Assets" + (this.m_LocalRootPath ?? string.Empty)).Trim(new char[]
+        {
+            '/'
+        });
+        string guid = AssetDatabase.AssetPathToGUID(text);
+        string[] guids = Packager.CollectAllChildren(guid, collection);
+        string[] array = Packager.BuildExportPackageAssetListGuids(guids, true);
+        List<string> list = new List<string>();
+        string value = text.ToLower();
+        string[] array2 = array;
+        for (int i = 0; i < array2.Length; i++)
+        {
+            string text2 = array2[i];
+            string text3 = AssetDatabase.GUIDToAssetPath(text2).ToLower();
+            if (text3.StartsWith("assets/plugins") || text3.Contains("standard assets") || text3.StartsWith(value))
+            {
+                list.Add(text2);
+            }
+        }
+        if (includeProjectSettings)
+        {
+            string[] files = Directory.GetFiles("ProjectSettings");
+            string[] array3 = files;
+            for (int j = 0; j < array3.Length; j++)
+            {
+                string text4 = array3[j];
+                string text5 = AssetDatabase.AssetPathToGUID(text4);
+                if (text5.Length > 0)
+                {
+                    list.Add(text5);
+                }
+            }
+        }
+        string[] array4 = new string[list.Count];
+        list.CopyTo(array4);
+        return array4;
+    }
 
-	private static bool CancelableProgressBar(float progress, string message, string buttonText)
+    private static bool CancelableProgressBar(float progress, string message, string buttonText)
 	{
 		Rect rect = GUILayoutUtility.GetRect(200f, 19f);
 		EditorGUI.ProgressBar(rect, progress, message);
