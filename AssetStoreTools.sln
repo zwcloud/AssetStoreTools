@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26127.3
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AssetStoreTools", "src\AssetStoreTools.shproj", "{882E1CC8-B375-47C7-AFB0-39428147D964}"
 EndProject
@@ -17,10 +17,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "5.4.0", "build\5.4.0\5.4.0.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "5.5.0", "build\5.5.0\5.5.0.csproj", "{FD7E4454-1367-4CA2-B2DC-670F75A4045B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "5.6.0", "build\5.6.0\5.6.0.csproj", "{7F430CC2-44E5-4CAC-B786-70A8420EB200}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2017.1", "build\2017.1\2017.1.csproj", "{66A34B98-1D74-44A7-AFBC-A82B12F68628}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\AssetStoreTools.projitems*{0274f599-d9e9-4460-a3b4-a4d0bc1cf15c}*SharedItemsImports = 4
 		src\AssetStoreTools.projitems*{2d609dfc-c51e-4172-af19-2f9022f1c691}*SharedItemsImports = 4
+		src\AssetStoreTools.projitems*{66a34b98-1d74-44a7-afbc-a82b12f68628}*SharedItemsImports = 4
+		src\AssetStoreTools.projitems*{7f430cc2-44e5-4cac-b786-70a8420eb200}*SharedItemsImports = 4
 		src\AssetStoreTools.projitems*{882e1cc8-b375-47c7-afb0-39428147d964}*SharedItemsImports = 13
 		src\AssetStoreTools.projitems*{bad419f3-5382-43c0-93b1-335f626a09fa}*SharedItemsImports = 4
 		src\AssetStoreTools.projitems*{fd7e4454-1367-4ca2-b2dc-670f75a4045b}*SharedItemsImports = 4
@@ -46,6 +52,14 @@ Global
 		{FD7E4454-1367-4CA2-B2DC-670F75A4045B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD7E4454-1367-4CA2-B2DC-670F75A4045B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD7E4454-1367-4CA2-B2DC-670F75A4045B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F430CC2-44E5-4CAC-B786-70A8420EB200}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F430CC2-44E5-4CAC-B786-70A8420EB200}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F430CC2-44E5-4CAC-B786-70A8420EB200}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F430CC2-44E5-4CAC-B786-70A8420EB200}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66A34B98-1D74-44A7-AFBC-A82B12F68628}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66A34B98-1D74-44A7-AFBC-A82B12F68628}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66A34B98-1D74-44A7-AFBC-A82B12F68628}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66A34B98-1D74-44A7-AFBC-A82B12F68628}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,5 +70,10 @@ Global
 		{0274F599-D9E9-4460-A3B4-A4D0BC1CF15C} = {76B5C487-6359-4225-B0A9-EC5EDC351DF3}
 		{BAD419F3-5382-43C0-93B1-335F626A09FA} = {76B5C487-6359-4225-B0A9-EC5EDC351DF3}
 		{FD7E4454-1367-4CA2-B2DC-670F75A4045B} = {76B5C487-6359-4225-B0A9-EC5EDC351DF3}
+		{7F430CC2-44E5-4CAC-B786-70A8420EB200} = {76B5C487-6359-4225-B0A9-EC5EDC351DF3}
+		{66A34B98-1D74-44A7-AFBC-A82B12F68628} = {76B5C487-6359-4225-B0A9-EC5EDC351DF3}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E84CD50F-5DE0-444E-AF32-7EE5C336A5A9}
 	EndGlobalSection
 EndGlobal
