@@ -6,190 +6,6 @@ using UnityEngine;
 
 public class FileSelector : EditorWindow
 {
-	private class AlphabeticComparer : IComparer<FileSelector.FileNode>
-	{
-		public int Compare(FileSelector.FileNode a, FileSelector.FileNode b)
-		{
-			return a.Name.CompareTo(b.Name);
-		}
-	}
-
-	private class FileNode
-	{
-		private static IComparer<FileSelector.FileNode> alphabeticalComparer = new FileSelector.AlphabeticComparer();
-
-		private string m_RelativePath;
-
-		private string m_Name;
-
-		private bool m_isDir;
-
-		private List<FileSelector.FileNode> m_SubDirectories;
-
-		private List<FileSelector.FileNode> m_SubFiles;
-
-		private List<FileSelector.FileNode> m_Children;
-
-		private Texture m_Icon;
-
-		private bool m_Expanded;
-
-		private bool m_Selected;
-
-		private int m_Depth;
-
-		public List<FileSelector.FileNode> Childrens
-		{
-			get
-			{
-				return this.m_Children;
-			}
-		}
-
-		public List<FileSelector.FileNode> SubDirectories
-		{
-			get
-			{
-				return this.m_SubDirectories;
-			}
-		}
-
-		public List<FileSelector.FileNode> Files
-		{
-			get
-			{
-				return this.m_SubFiles;
-			}
-		}
-
-		public string Name
-		{
-			get
-			{
-				return this.m_RelativePath;
-			}
-		}
-
-		public bool isDirectory
-		{
-			get
-			{
-				return this.m_isDir;
-			}
-		}
-
-		public bool Selected
-		{
-			get
-			{
-				return this.m_Selected;
-			}
-			set
-			{
-				this.m_Selected = value;
-			}
-		}
-
-		public bool Expanded
-		{
-			get
-			{
-				return this.m_Expanded;
-			}
-			set
-			{
-				this.m_Expanded = value;
-			}
-		}
-
-		public int Depth
-		{
-			get
-			{
-				return this.m_Depth;
-			}
-		}
-
-		public FileNode(FileSystemInfo fileInfo, int depth = 0)
-		{
-			string fullName = fileInfo.FullName;
-			this.m_Name = fileInfo.Name;
-			this.m_Depth = depth;
-			this.m_RelativePath = "Assets/" + fullName.Substring(Application.dataPath.Length + 1);
-			this.m_RelativePath = this.m_RelativePath.Replace("\\", "/");
-			this.m_SubFiles = new List<FileSelector.FileNode>();
-			this.m_SubDirectories = new List<FileSelector.FileNode>();
-			this.m_Children = new List<FileSelector.FileNode>();
-			if (fileInfo is DirectoryInfo)
-			{
-				this.m_Icon = EditorGUIUtility.FindTexture("_Folder");
-				if (this.m_Icon == null)
-				{
-					this.m_Icon = EditorGUIUtility.FindTexture("Folder Icon");
-				}
-				this.m_isDir = true;
-				DirectoryInfo directoryInfo = fileInfo as DirectoryInfo;
-				FileSystemInfo[] fileSystemInfos = directoryInfo.GetFileSystemInfos();
-				FileSystemInfo[] array = fileSystemInfos;
-				for (int i = 0; i < array.Length; i++)
-				{
-					FileSystemInfo fileSystemInfo = array[i];
-					if (!fileSystemInfo.Name.EndsWith(".meta") && !fileSystemInfo.Name.StartsWith(".") && !fileSystemInfo.Name.EndsWith(".unity"))
-					{
-						FileSelector.FileNode item = new FileSelector.FileNode(fileSystemInfo, this.m_Depth + 1);
-						if (fileSystemInfo is DirectoryInfo)
-						{
-							this.m_SubDirectories.Add(item);
-						}
-						else
-						{
-							this.m_SubFiles.Add(item);
-						}
-						this.m_Children.Add(item);
-					}
-				}
-				this.m_Children.Sort(FileSelector.FileNode.alphabeticalComparer);
-				return;
-			}
-			this.m_Icon = (AssetDatabase.GetCachedIcon(this.m_RelativePath) as Texture2D);
-			if (!this.m_Icon)
-			{
-				this.m_Icon = EditorGUIUtility.ObjectContent(null, typeof(MonoBehaviour)).image;
-			}
-		}
-
-		public void RenderIconText()
-		{
-			GUIContent gUIContent = new GUIContent();
-			gUIContent.image = this.m_Icon;
-			gUIContent.text = this.m_Name;
-			GUILayout.Label(gUIContent.image, new GUILayoutOption[]
-			{
-				GUILayout.Height(21f),
-				GUILayout.Width(21f)
-			});
-			GUILayout.Label(gUIContent.text, new GUILayoutOption[]
-			{
-				GUILayout.Height(21f)
-			});
-			//GUILayout.FlexibleSpace();
-		}
-	}
-
-	public delegate void DoneCallback(List<string> updatedMainAssets);
-
-	private string m_Directory;
-
-	private FileSelector.FileNode m_RootDir;
-
-	private LinkedList<FileSelector.FileNode> m_SelectedFiles;
-
-	private Vector2 m_FileScrollPos;
-
-	private Vector2 m_FileSelectedScrollPos;
-
-	private FileSelector.DoneCallback m_OnFinishSelecting;
-
 	public static FileSelector Show(string directory, List<string> preSelectedFiles, FileSelector.DoneCallback onFinishSelecting)
 	{
 		FileSelector fileSelector = EditorWindow.GetWindow(typeof(FileSelector), true, "Please Select Main Assets") as FileSelector;
@@ -499,4 +315,186 @@ If you are uploading a Character, the Character prefab would be a good candidate
 		}
 		GUILayout.EndHorizontal();
 	}
+
+	private string m_Directory;
+
+	private FileSelector.FileNode m_RootDir;
+
+	private LinkedList<FileSelector.FileNode> m_SelectedFiles;
+
+	private Vector2 m_FileScrollPos;
+
+	private Vector2 m_FileSelectedScrollPos;
+
+	private FileSelector.DoneCallback m_OnFinishSelecting;
+
+	private class AlphabeticComparer : IComparer<FileSelector.FileNode>
+	{
+		public int Compare(FileSelector.FileNode a, FileSelector.FileNode b)
+		{
+			return a.Name.CompareTo(b.Name);
+		}
+	}
+
+	private class FileNode
+	{
+		public FileNode(FileSystemInfo fileInfo, int depth = 0)
+		{
+			string fullName = fileInfo.FullName;
+			this.m_Name = fileInfo.Name;
+			this.m_Depth = depth;
+			this.m_RelativePath = "Assets/" + fullName.Substring(Application.dataPath.Length + 1);
+			this.m_RelativePath = this.m_RelativePath.Replace("\\", "/");
+			this.m_SubFiles = new List<FileSelector.FileNode>();
+			this.m_SubDirectories = new List<FileSelector.FileNode>();
+			this.m_Children = new List<FileSelector.FileNode>();
+			if (fileInfo is DirectoryInfo)
+			{
+				this.m_Icon = EditorGUIUtility.FindTexture("_Folder");
+				if (this.m_Icon == null)
+				{
+					this.m_Icon = EditorGUIUtility.FindTexture("Folder Icon");
+				}
+				this.m_isDir = true;
+				DirectoryInfo directoryInfo = fileInfo as DirectoryInfo;
+				FileSystemInfo[] fileSystemInfos = directoryInfo.GetFileSystemInfos();
+				foreach (FileSystemInfo fileSystemInfo in fileSystemInfos)
+				{
+					if (!fileSystemInfo.Name.EndsWith(".meta") && !fileSystemInfo.Name.StartsWith(".") && !fileSystemInfo.Name.EndsWith(".unity"))
+					{
+						FileSelector.FileNode item = new FileSelector.FileNode(fileSystemInfo, this.m_Depth + 1);
+						if (fileSystemInfo is DirectoryInfo)
+						{
+							this.m_SubDirectories.Add(item);
+						}
+						else
+						{
+							this.m_SubFiles.Add(item);
+						}
+						this.m_Children.Add(item);
+					}
+				}
+				this.m_Children.Sort(FileSelector.FileNode.alphabeticalComparer);
+				return;
+			}
+			this.m_Icon = (AssetDatabase.GetCachedIcon(this.m_RelativePath) as Texture2D);
+			if (!this.m_Icon)
+			{
+				this.m_Icon = EditorGUIUtility.ObjectContent(null, typeof(MonoBehaviour)).image;
+			}
+		}
+
+		public List<FileSelector.FileNode> Childrens
+		{
+			get
+			{
+				return this.m_Children;
+			}
+		}
+
+		public List<FileSelector.FileNode> SubDirectories
+		{
+			get
+			{
+				return this.m_SubDirectories;
+			}
+		}
+
+		public List<FileSelector.FileNode> Files
+		{
+			get
+			{
+				return this.m_SubFiles;
+			}
+		}
+
+		public string Name
+		{
+			get
+			{
+				return this.m_RelativePath;
+			}
+		}
+
+		public bool isDirectory
+		{
+			get
+			{
+				return this.m_isDir;
+			}
+		}
+
+		public bool Selected
+		{
+			get
+			{
+				return this.m_Selected;
+			}
+			set
+			{
+				this.m_Selected = value;
+			}
+		}
+
+		public bool Expanded
+		{
+			get
+			{
+				return this.m_Expanded;
+			}
+			set
+			{
+				this.m_Expanded = value;
+			}
+		}
+
+		public int Depth
+		{
+			get
+			{
+				return this.m_Depth;
+			}
+		}
+
+		public void RenderIconText()
+		{
+			GUIContent guicontent = new GUIContent();
+			guicontent.image = this.m_Icon;
+			guicontent.text = this.m_Name;
+			GUILayout.Label(guicontent.image, new GUILayoutOption[]
+			{
+				GUILayout.Height(21f),
+				GUILayout.Width(21f)
+			});
+			GUILayout.Label(guicontent.text, new GUILayoutOption[]
+			{
+				GUILayout.Height(21f)
+			});
+			GUILayout.FlexibleSpace();
+		}
+
+		private static IComparer<FileSelector.FileNode> alphabeticalComparer = new FileSelector.AlphabeticComparer();
+
+		private string m_RelativePath;
+
+		private string m_Name;
+
+		private bool m_isDir;
+
+		private List<FileSelector.FileNode> m_SubDirectories;
+
+		private List<FileSelector.FileNode> m_SubFiles;
+
+		private List<FileSelector.FileNode> m_Children;
+
+		private Texture m_Icon;
+
+		private bool m_Expanded;
+
+		private bool m_Selected;
+
+		private int m_Depth;
+	}
+
+	public delegate void DoneCallback(List<string> updatedMainAssets);
 }
