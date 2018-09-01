@@ -13,6 +13,7 @@ internal class AssetStoreManager : EditorWindow
 	[MenuItem("Asset Store Tools/Package Upload", false, 0)]
 	private static void Launch()
 	{
+        #if !UNITY_2017 && !UNITY_2018
 		if (Application.webSecurityEnabled)
 		{
 			bool flag = EditorUtility.DisplayDialog("Web player platform active", "You are currently using the Web Player platform. To upload Asset Store packages please switch platform to PC and Mac standalone in File -> Build Settings...", "Switch my Active Platform.", "Cancel");
@@ -35,6 +36,8 @@ internal class AssetStoreManager : EditorWindow
 				DebugUtils.LogError("Unable to invoke UnityEditor.EditorUserBuildSettings");
 			}
 		}
+        #endif
+
 		EditorApplication.update = (EditorApplication.CallbackFunction)Delegate.Remove(EditorApplication.update, new EditorApplication.CallbackFunction(AssetStoreClient.Update));
 		EditorApplication.update = (EditorApplication.CallbackFunction)Delegate.Combine(EditorApplication.update, new EditorApplication.CallbackFunction(AssetStoreClient.Update));
 		AssetStoreManager.Login("Login to fetch current list of published packages");
