@@ -1,40 +1,23 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 internal class Package
 {
-	internal enum PublishedStatus
+	public Package(int id)
 	{
-		Draft,
-		Disabled,
-		Published,
-		PendingReview
+		this.m_Id = id;
 	}
 
-	private int m_Id = -1;
-
-	public int versionId = -1;
-
-	public string Name = string.Empty;
-
-	public string VersionName = string.Empty;
-
-	public string ProjectPath = string.Empty;
-
-	public string RootPath = string.Empty;
-
-	public string RootGUID = string.Empty;
-
-	public List<string> MainAssets = new List<string>();
-
-	public bool IsCompleteProjects;
-
-	public string PreviewURL;
-
-	private Image m_IconKeyimage = new Image();
-
-	private Package.PublishedStatus m_Status;
+	public Package(int id, string name, string iconUrl) : this(id)
+	{
+		this.Name = name;
+		this.m_IconKeyimage.Name = "icon";
+		if (iconUrl != null)
+		{
+			this.SetIconURL(iconUrl);
+		}
+	}
 
 	public int Id
 	{
@@ -57,21 +40,6 @@ internal class Package
 		get
 		{
 			return this.m_Status;
-		}
-	}
-
-	public Package(int id)
-	{
-		this.m_Id = id;
-	}
-
-	public Package(int id, string name, string iconUrl) : this(id)
-	{
-		this.Name = name;
-		this.m_IconKeyimage.Name = "icon";
-		if (iconUrl != null)
-		{
-			this.SetIconURL(iconUrl);
 		}
 	}
 
@@ -106,5 +74,37 @@ internal class Package
 		{
 			this.m_Status = Package.PublishedStatus.Disabled;
 		}
+	}
+
+	private int m_Id = -1;
+
+	public int versionId = -1;
+
+	public string Name = string.Empty;
+
+	public string VersionName = string.Empty;
+
+	public string ProjectPath = string.Empty;
+
+	public string RootPath = string.Empty;
+
+	public string RootGUID = string.Empty;
+
+	public List<string> MainAssets = new List<string>();
+
+	public bool IsCompleteProjects;
+
+	public string PreviewURL;
+
+	private Image m_IconKeyimage = new Image();
+
+	private Package.PublishedStatus m_Status;
+
+	internal enum PublishedStatus
+	{
+		Draft,
+		Disabled,
+		Published,
+		PendingReview
 	}
 }

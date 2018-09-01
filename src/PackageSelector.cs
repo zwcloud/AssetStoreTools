@@ -1,53 +1,14 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 internal class PackageSelector
 {
-	private class GUIStyles
+	public PackageSelector(PackageDataSource pkgDataSource, ListView<Package>.SelectionCallback selectionCallback)
 	{
-		internal readonly GUIStyle MarginBox = new GUIStyle();
-
-		internal GUIStyle AreaBox = new GUIStyle("GroupBox");
-
-		internal GUIStyle ToolbarSearchTextField;
-
-		internal GUIStyle ToolbarSearchFieldCancelButton;
-
-		internal GUIStyle ToolbarSearchFieldCancelButtonEmpty;
-
-		internal GUIStyle ListNodeTextField = new GUIStyle("PR Label");
-
-		public GUIStyles()
-		{
-			this.MarginBox.padding.top = 5;
-			this.MarginBox.padding.right = 15;
-			this.MarginBox.padding.bottom = 5;
-			this.MarginBox.padding.left = 15;
-			this.AreaBox.padding.top = 0;
-			this.AreaBox.padding.right = 0;
-			this.AreaBox.padding.bottom = 1;
-			this.AreaBox.padding.left = 0;
-			this.AreaBox.margin.top = 0;
-			this.AreaBox.margin.right = 0;
-			this.AreaBox.margin.bottom = 0;
-			this.AreaBox.margin.left = 0;
-			this.ToolbarSearchTextField = GUI.skin.FindStyle("SearchTextField");
-			this.ToolbarSearchFieldCancelButton = GUI.skin.FindStyle("SearchCancelButton");
-			this.ToolbarSearchFieldCancelButtonEmpty = GUI.skin.FindStyle("SearchCancelButtonEmpty");
-			this.ListNodeTextField.margin.left = 1;
-			this.ListNodeTextField.margin.right = 1;
-			this.ListNodeTextField.fixedHeight = 50f;
-			this.ListNodeTextField.alignment = TextAnchor.MiddleLeft;
-		}
+		this.m_PkgDataSource = pkgDataSource;
+		PackageListGUI gui = new PackageListGUI();
+		this.m_PackageList = new ListView<Package>(this.m_PkgDataSource, gui, selectionCallback, selectionCallback);
 	}
-
-	private static PackageSelector.GUIStyles s_Styles;
-
-	private string m_SearchTerm = string.Empty;
-
-	private ListView<Package> m_PackageList;
-
-	private PackageDataSource m_PkgDataSource;
 
 	private static PackageSelector.GUIStyles Styles
 	{
@@ -71,13 +32,6 @@ internal class PackageSelector
 		{
 			this.m_PackageList.Selected = value;
 		}
-	}
-
-	public PackageSelector(PackageDataSource pkgDataSource, ListView<Package>.SelectionCallback selectionCallback)
-	{
-		this.m_PkgDataSource = pkgDataSource;
-		PackageListGUI gui = new PackageListGUI();
-		this.m_PackageList = new ListView<Package>(this.m_PkgDataSource, gui, selectionCallback, selectionCallback);
 	}
 
 	private void RenderSearch()
@@ -132,5 +86,51 @@ internal class PackageSelector
 			this.m_PackageList.OnGUI(rect);
 		}
 		GUILayout.EndVertical();
+	}
+
+	private static PackageSelector.GUIStyles s_Styles;
+
+	private string m_SearchTerm = string.Empty;
+
+	private ListView<Package> m_PackageList;
+
+	private PackageDataSource m_PkgDataSource;
+
+	private class GUIStyles
+	{
+		public GUIStyles()
+		{
+			this.MarginBox.padding.top = 5;
+			this.MarginBox.padding.right = 15;
+			this.MarginBox.padding.bottom = 5;
+			this.MarginBox.padding.left = 15;
+			this.AreaBox.padding.top = 0;
+			this.AreaBox.padding.right = 0;
+			this.AreaBox.padding.bottom = 1;
+			this.AreaBox.padding.left = 0;
+			this.AreaBox.margin.top = 0;
+			this.AreaBox.margin.right = 0;
+			this.AreaBox.margin.bottom = 0;
+			this.AreaBox.margin.left = 0;
+			this.ToolbarSearchTextField = GUI.skin.FindStyle("SearchTextField");
+			this.ToolbarSearchFieldCancelButton = GUI.skin.FindStyle("SearchCancelButton");
+			this.ToolbarSearchFieldCancelButtonEmpty = GUI.skin.FindStyle("SearchCancelButtonEmpty");
+			this.ListNodeTextField.margin.left = 1;
+			this.ListNodeTextField.margin.right = 1;
+			this.ListNodeTextField.fixedHeight = 50f;
+			this.ListNodeTextField.alignment = (TextAnchor)3;
+		}
+
+		internal readonly GUIStyle MarginBox = new GUIStyle();
+
+		internal GUIStyle AreaBox = new GUIStyle("GroupBox");
+
+		internal GUIStyle ToolbarSearchTextField;
+
+		internal GUIStyle ToolbarSearchFieldCancelButton;
+
+		internal GUIStyle ToolbarSearchFieldCancelButtonEmpty;
+
+		internal GUIStyle ListNodeTextField = new GUIStyle("PR Label");
 	}
 }

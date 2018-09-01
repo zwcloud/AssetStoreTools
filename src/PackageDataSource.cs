@@ -1,18 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 internal class PackageDataSource : IDataSource<Package>
 {
-	public delegate void DoneCallback();
-
-	private List<Package> m_PackageList = new List<Package>();
-
-	private List<Package> m_PackageListFiltered = new List<Package>();
-
-	private string m_Filter = string.Empty;
-
-	private PackageDataSource.DoneCallback m_DataReadyCallback;
-
 	public PackageDataSource()
 	{
 	}
@@ -83,12 +73,12 @@ internal class PackageDataSource : IDataSource<Package>
 		this.m_PackageListFiltered.Clear();
 		if (this.m_Filter.Length > 0)
 		{
-			foreach (Package current in this.m_PackageList)
+			foreach (Package package in this.m_PackageList)
 			{
-				bool flag = current.Name.IndexOf(this.m_Filter, StringComparison.OrdinalIgnoreCase) >= 0;
-				if (current.Name != null && flag)
+				bool flag = package.Name.IndexOf(this.m_Filter, StringComparison.OrdinalIgnoreCase) >= 0;
+				if (package.Name != null && flag)
 				{
-					this.m_PackageListFiltered.Add(current);
+					this.m_PackageListFiltered.Add(package);
 				}
 			}
 		}
@@ -98,4 +88,14 @@ internal class PackageDataSource : IDataSource<Package>
 	{
 		return this.m_PackageList.Find((Package pack) => pack.Id == packId);
 	}
+
+	private List<Package> m_PackageList = new List<Package>();
+
+	private List<Package> m_PackageListFiltered = new List<Package>();
+
+	private string m_Filter = string.Empty;
+
+	private PackageDataSource.DoneCallback m_DataReadyCallback;
+
+	public delegate void DoneCallback();
 }

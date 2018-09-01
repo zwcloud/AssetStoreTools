@@ -1,42 +1,9 @@
-using System;
+﻿using System;
 using UnityEditor;
 using UnityEngine;
 
 internal class PackageListGUI : DefaultListViewGUI<Package>
 {
-	private class GUIStyles
-	{
-		internal GUIStyle MarginBox = new GUIStyle();
-
-		internal GUIStyle AreaBox = new GUIStyle("GroupBox");
-
-		internal GUIStyle ListNodeTextField = new GUIStyle("PR Label");
-
-		public GUIStyles()
-		{
-			this.MarginBox.padding.top = 5;
-			this.MarginBox.padding.right = 15;
-			this.MarginBox.padding.bottom = 5;
-			this.MarginBox.padding.left = 15;
-			this.AreaBox.padding.top = 0;
-			this.AreaBox.padding.right = 0;
-			this.AreaBox.padding.bottom = 1;
-			this.AreaBox.padding.left = 0;
-			this.AreaBox.margin.top = 0;
-			this.AreaBox.margin.right = 0;
-			this.AreaBox.margin.bottom = 0;
-			this.AreaBox.margin.left = 0;
-			this.ListNodeTextField.margin.left = 1;
-			this.ListNodeTextField.margin.right = 1;
-			this.ListNodeTextField.fixedHeight = 50f;
-			this.ListNodeTextField.alignment = TextAnchor.MiddleLeft;
-			this.ListNodeTextField.padding.top = Mathf.FloorToInt((this.ListNodeTextField.fixedHeight - 32f) / 2f);
-			this.ListNodeTextField.padding.bottom = this.ListNodeTextField.padding.top;
-		}
-	}
-
-	private static PackageListGUI.GUIStyles s_Styles;
-
 	private static PackageListGUI.GUIStyles Styles
 	{
 		get
@@ -92,5 +59,38 @@ internal class PackageListGUI : DefaultListViewGUI<Package>
 	public override Vector2 GetNodeArea(Package node)
 	{
 		return PackageListGUI.Styles.ListNodeTextField.CalcSize(GUIContent.none);
+	}
+
+	private static PackageListGUI.GUIStyles s_Styles;
+
+	private class GUIStyles
+	{
+		public GUIStyles()
+		{
+			this.MarginBox.padding.top = 5;
+			this.MarginBox.padding.right = 15;
+			this.MarginBox.padding.bottom = 5;
+			this.MarginBox.padding.left = 15;
+			this.AreaBox.padding.top = 0;
+			this.AreaBox.padding.right = 0;
+			this.AreaBox.padding.bottom = 1;
+			this.AreaBox.padding.left = 0;
+			this.AreaBox.margin.top = 0;
+			this.AreaBox.margin.right = 0;
+			this.AreaBox.margin.bottom = 0;
+			this.AreaBox.margin.left = 0;
+			this.ListNodeTextField.margin.left = 1;
+			this.ListNodeTextField.margin.right = 1;
+			this.ListNodeTextField.fixedHeight = 50f;
+			this.ListNodeTextField.alignment = (TextAnchor)3;
+			this.ListNodeTextField.padding.top = Mathf.FloorToInt((this.ListNodeTextField.fixedHeight - 32f) / 2f);
+			this.ListNodeTextField.padding.bottom = this.ListNodeTextField.padding.top;
+		}
+
+		internal GUIStyle MarginBox = new GUIStyle();
+
+		internal GUIStyle AreaBox = new GUIStyle("GroupBox");
+
+		internal GUIStyle ListNodeTextField = new GUIStyle("PR Label");
 	}
 }
