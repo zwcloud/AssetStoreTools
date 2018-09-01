@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -18,19 +18,21 @@ internal static class Packager
 		});
 	}
 
-	internal static void ExportPackage(string[] guids, string fileName)
+	internal static void ExportPackage(string[] guids, string fileName, bool needsPackageManagerManifest)
 	{
-		List<string> methods = new List<string>
+		List<string> list = new List<string>();
+		if (needsPackageManagerManifest)
 		{
-			"UnityEditor.PackageUtility.ExportPackage",
-			"UnityEditor.AssetServer.ExportPackage"
-		};
+			list.Add("UnityEditor.PackageUtility.ExportPackageAndPackageManagerManifest");
+		}
+		list.Add("UnityEditor.PackageUtility.ExportPackage");
+		list.Add("UnityEditor.AssetServer.ExportPackage");
 		object[] parameters = new object[]
 		{
 			guids,
 			fileName
 		};
-		BackwardsCompatibilityUtility.TryStaticInvoke(methods, parameters);
+		BackwardsCompatibilityUtility.TryStaticInvoke(list, parameters);
 	}
 
 	internal static string[] BuildExportPackageAssetListGuids(string[] guids, bool dependencies)

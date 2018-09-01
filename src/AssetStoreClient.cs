@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -15,162 +15,61 @@ using UnityEngine;
 
 internal static class AssetStoreClient
 {
-	private enum LoginState
+	static AssetStoreClient()
 	{
-		LOGGED_OUT,
-		IN_PROGRESS,
-		LOGGED_IN,
-		LOGIN_ERROR
+		ServicePointManager.ServerCertificateValidationCallback = ((object A_0, X509Certificate A_1, X509Chain A_2, SslPolicyErrors A_3) => true);
 	}
-
-	private class LargeFilePending
-	{
-		public string Id;
-
-		public string FilePath;
-
-		public string URI;
-
-		public FileStream RequestFileStream;
-
-		public HttpWebRequest Request;
-
-		public Stream RequestStream;
-
-		public long BytesToSend;
-
-		public long BytesSent;
-
-		public AssetStoreClient.DoneCallback RequestDoneCallback;
-
-		public AssetStoreClient.ProgressCallback RequestProgressCallback;
-
-		public byte[] Buffer;
-
-		private Dictionary<string, string> m_extraParams;
-
-		public LargeFilePending(string url, string filepath, Dictionary<string, string> extraParams, AssetStoreClient.DoneCallback doneCallback, AssetStoreClient.ProgressCallback progressCallback)
-		{
-			this.Id = filepath;
-			this.URI = url;
-			this.FilePath = filepath;
-			this.RequestDoneCallback = doneCallback;
-			this.RequestProgressCallback = progressCallback;
-			this.m_extraParams = extraParams;
-		}
-
-		public void Open()
-		{
-			try
-			{
-				this.RequestFileStream = new FileStream(this.FilePath, FileMode.Open, FileAccess.Read);
-				this.Request = (HttpWebRequest)WebRequest.Create(AssetStoreClient.APIUri(this.URI, this.m_extraParams));
-				this.Request.AllowWriteStreamBuffering = false;
-				this.Request.Timeout = 36000000;
-				this.Request.Headers.Set("X-Unity-Session", AssetStoreClient.ActiveOrUnauthSessionID);
-				this.Request.KeepAlive = false;
-				this.Request.ContentLength = this.RequestFileStream.Length;
-				this.Request.Method = "PUT";
-				this.BytesToSend = this.RequestFileStream.Length;
-				this.BytesSent = 0L;
-				this.RequestStream = this.Request.GetRequestStream();
-				if (this.Buffer == null)
-				{
-					this.Buffer = new byte[32768];
-				}
-			}
-			catch (Exception ex)
-			{
-				AssetStoreResponse job = AssetStoreClient.parseAssetStoreResponse(null, null, ex, null);
-				this.RequestDoneCallback(job);
-				this.Close();
-				throw ex;
-			}
-		}
-
-		public void Close()
-		{
-			if (this.RequestFileStream != null)
-			{
-				this.RequestFileStream.Close();
-				this.RequestFileStream = null;
-			}
-			if (this.RequestStream != null)
-			{
-				this.RequestStream.Close();
-				this.RequestStream = null;
-			}
-			this.Request = null;
-			this.Buffer = null;
-		}
-	}
-
-	public class Pending
-	{
-		internal AssetStoreClient.PendingQueueDelegate queueDelegate;
-
-		public AssetStoreWebClient conn;
-
-		public Exception ex;
-
-		public string data;
-
-		public byte[] binData;
-
-		public volatile uint bytesReceived;
-
-		public volatile uint totalBytesToReceive;
-
-		public volatile uint bytesSend;
-
-		public volatile uint totalBytesToSend;
-
-		public volatile bool statsUpdated;
-
-		public string id;
-
-		public AssetStoreClient.DoneCallback callback;
-
-		public AssetStoreClient.ProgressCallback progressCallback;
-	}
-
-	public delegate void DoneLoginCallback(string errorMessage);
-
-	internal delegate void DoneCallback(AssetStoreResponse job);
-
-	public delegate void ProgressCallback(double pctUp, double pctDown);
-
-	internal delegate bool PendingQueueDelegate();
-
-	public const string TOOL_VERSION = "V4.0.7";
-
-	private const string ASSET_STORE_PROD_URL = "https://kharma.unity3d.com";
-
-	private const string UNAUTH_SESSION_ID = "26c4202eb475d02864b40827dfff11a14657aa41";
-
-	private const int kClientPoolSize = 5;
-
-	private const int kSendBufferSize = 32768;
-
-	private static string sActiveSessionIdBackwardsCompatibility;
-
-	private static AssetStoreClient.LoginState sLoginState;
-
-	private static string sLoginErrorMessage;
-
-	private static Stack<AssetStoreWebClient> sClientPool;
-
-	private static List<AssetStoreClient.LargeFilePending> s_PendingLargeFiles;
-
-	private static AssetStoreClient.LargeFilePending s_UploadingLargeFile;
-
-	private static List<AssetStoreClient.Pending> pending;
 
 	public static string LoginErrorMessage
 	{
 		get
 		{
 			return AssetStoreClient.sLoginErrorMessage;
+		}
+	}
+
+	public static NameValueCollection Dict2Params(Dictionary<string, string> d)
+	{
+		NameValueCollection nameValueCollection = new NameValueCollection();
+		foreach (KeyValuePair<string, string> keyValuePair in d)
+		{
+			nameValueCollection.Add(keyValuePair.Key, keyValuePair.Value);
+		}
+		return nameValueCollection;
+	}
+
+	private static void InitClientPool()
+	{
+		if (AssetStoreClient.sClientPool != null)
+		{
+			return;
+		}
+		AssetStoreClient.sClientPool = new Stack<AssetStoreWebClient>(5);
+		for (int i = 0; i < 5; i++)
+		{
+			AssetStoreWebClient assetStoreWebClient = new AssetStoreWebClient();
+			assetStoreWebClient.Encoding = Encoding.UTF8;
+			AssetStoreClient.sClientPool.Push(assetStoreWebClient);
+		}
+	}
+
+	private static AssetStoreWebClient AcquireClient()
+	{
+		AssetStoreClient.InitClientPool();
+		if (AssetStoreClient.sClientPool.Count != 0)
+		{
+			return AssetStoreClient.sClientPool.Pop();
+		}
+		return null;
+	}
+
+	private static void ReleaseClient(AssetStoreWebClient client)
+	{
+		AssetStoreClient.InitClientPool();
+		if (client != null)
+		{
+			client.Headers.Remove("X-HttpMethod");
+			AssetStoreClient.sClientPool.Push(client);
 		}
 	}
 
@@ -195,6 +94,50 @@ internal static class AssetStoreClient
 			}
 			return "https://kharma.unity3d.com";
 		}
+	}
+
+	private static string GetProperPath(string partialPath)
+	{
+		return string.Format("{0}/api/asset-store-tools{1}.json", AssetStoreClient.AssetStoreUrl, partialPath);
+	}
+
+	private static Uri APIUri(string path)
+	{
+		return AssetStoreClient.APIUri(path, null);
+	}
+
+	private static Uri APIUri(string path, IDictionary<string, string> extraQuery)
+	{
+		Dictionary<string, string> dictionary;
+		if (extraQuery != null)
+		{
+			dictionary = new Dictionary<string, string>(extraQuery);
+		}
+		else
+		{
+			dictionary = new Dictionary<string, string>();
+		}
+		dictionary.Add("unityversion", Application.unityVersion);
+		dictionary.Add("toolversion", "V4.1.0");
+		dictionary.Add("xunitysession", AssetStoreClient.ActiveOrUnauthSessionID);
+		UriBuilder uriBuilder = new UriBuilder(AssetStoreClient.GetProperPath(path));
+		StringBuilder stringBuilder = new StringBuilder();
+		foreach (KeyValuePair<string, string> keyValuePair in dictionary)
+		{
+			string key = keyValuePair.Key;
+			string arg = Uri.EscapeDataString(keyValuePair.Value);
+			stringBuilder.AppendFormat("&{0}={1}", key, arg);
+		}
+		if (!string.IsNullOrEmpty(uriBuilder.Query))
+		{
+			uriBuilder.Query = uriBuilder.Query.Substring(1) + stringBuilder;
+		}
+		else
+		{
+			uriBuilder.Query = stringBuilder.Remove(0, 1).ToString();
+		}
+		DebugUtils.Log("preparing: " + uriBuilder.Uri);
+		return uriBuilder.Uri;
 	}
 
 	private static string SavedSessionID
@@ -302,119 +245,6 @@ internal static class AssetStoreClient
 		}
 	}
 
-	public static string XUnitySession
-	{
-		get
-		{
-			return AssetStoreClient.ActiveOrUnauthSessionID;
-		}
-	}
-
-	private static string UserIconUrl
-	{
-		get;
-		set;
-	}
-
-	static AssetStoreClient()
-	{
-		AssetStoreClient.sLoginState = AssetStoreClient.LoginState.LOGGED_OUT;
-		AssetStoreClient.sLoginErrorMessage = null;
-		AssetStoreClient.s_PendingLargeFiles = new List<AssetStoreClient.LargeFilePending>();
-		AssetStoreClient.s_UploadingLargeFile = null;
-		AssetStoreClient.pending = new List<AssetStoreClient.Pending>();
-		ServicePointManager.ServerCertificateValidationCallback = ((object obj, X509Certificate x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors) => true);
-	}
-
-	public static NameValueCollection Dict2Params(Dictionary<string, string> d)
-	{
-		NameValueCollection nameValueCollection = new NameValueCollection();
-		foreach (KeyValuePair<string, string> current in d)
-		{
-			nameValueCollection.Add(current.Key, current.Value);
-		}
-		return nameValueCollection;
-	}
-
-	private static void InitClientPool()
-	{
-		if (AssetStoreClient.sClientPool != null)
-		{
-			return;
-		}
-		AssetStoreClient.sClientPool = new Stack<AssetStoreWebClient>(5);
-		for (int i = 0; i < 5; i++)
-		{
-			AssetStoreWebClient assetStoreWebClient = new AssetStoreWebClient();
-			assetStoreWebClient.Encoding = Encoding.UTF8;
-			AssetStoreClient.sClientPool.Push(assetStoreWebClient);
-		}
-	}
-
-	private static AssetStoreWebClient AcquireClient()
-	{
-		AssetStoreClient.InitClientPool();
-		if (AssetStoreClient.sClientPool.Count != 0)
-		{
-			return AssetStoreClient.sClientPool.Pop();
-		}
-		return null;
-	}
-
-	private static void ReleaseClient(AssetStoreWebClient client)
-	{
-		AssetStoreClient.InitClientPool();
-		if (client != null)
-		{
-			client.Headers.Remove("X-HttpMethod");
-			AssetStoreClient.sClientPool.Push(client);
-		}
-	}
-
-	private static string GetProperPath(string partialPath)
-	{
-		return string.Format("{0}/api/asset-store-tools{1}.json", AssetStoreClient.AssetStoreUrl, partialPath);
-	}
-
-	private static Uri APIUri(string path)
-	{
-		return AssetStoreClient.APIUri(path, null);
-	}
-
-	private static Uri APIUri(string path, IDictionary<string, string> extraQuery)
-	{
-		Dictionary<string, string> dictionary;
-		if (extraQuery != null)
-		{
-			dictionary = new Dictionary<string, string>(extraQuery);
-		}
-		else
-		{
-			dictionary = new Dictionary<string, string>();
-		}
-		dictionary.Add("unityversion", Application.unityVersion);
-		dictionary.Add("toolversion", "V4.0.7");
-		dictionary.Add("xunitysession", AssetStoreClient.ActiveOrUnauthSessionID);
-		UriBuilder uriBuilder = new UriBuilder(AssetStoreClient.GetProperPath(path));
-		StringBuilder stringBuilder = new StringBuilder();
-		foreach (KeyValuePair<string, string> current in dictionary)
-		{
-			string key = current.Key;
-			string arg = Uri.EscapeDataString(current.Value);
-			stringBuilder.AppendFormat("&{0}={1}", key, arg);
-		}
-		if (!string.IsNullOrEmpty(uriBuilder.Query))
-		{
-			uriBuilder.Query = uriBuilder.Query.Substring(1) + stringBuilder;
-		}
-		else
-		{
-			uriBuilder.Query = stringBuilder.Remove(0, 1).ToString();
-		}
-		DebugUtils.Log("preparing: " + uriBuilder.Uri);
-		return uriBuilder.Uri;
-	}
-
 	private static string GetLicenseHash()
 	{
 		return InternalEditorUtility.GetAuthToken().Substring(0, 40);
@@ -423,6 +253,14 @@ internal static class AssetStoreClient
 	private static string GetHardwareHash()
 	{
 		return InternalEditorUtility.GetAuthToken().Substring(40, 40);
+	}
+
+	public static string XUnitySession
+	{
+		get
+		{
+			return AssetStoreClient.ActiveOrUnauthSessionID;
+		}
 	}
 
 	public static bool LoggedIn()
@@ -445,6 +283,8 @@ internal static class AssetStoreClient
 		return AssetStoreClient.sLoginState == AssetStoreClient.LoginState.IN_PROGRESS;
 	}
 
+	private static string UserIconUrl { get; set; }
+
 	internal static void LoginWithCredentials(string username, string password, bool rememberMe, AssetStoreClient.DoneLoginCallback callback)
 	{
 		if (AssetStoreClient.sLoginState == AssetStoreClient.LoginState.IN_PROGRESS)
@@ -461,7 +301,7 @@ internal static class AssetStoreClient
 		nameValueCollection.Add("user", username);
 		nameValueCollection.Add("pass", password);
 		nameValueCollection.Add("unityversion", Application.unityVersion);
-		nameValueCollection.Add("toolversion", "V4.0.7");
+		nameValueCollection.Add("toolversion", "V4.1.0");
 		nameValueCollection.Add("license_hash", AssetStoreClient.GetLicenseHash());
 		nameValueCollection.Add("hardware_hash", AssetStoreClient.GetHardwareHash());
 		AssetStoreClient.Pending pending = new AssetStoreClient.Pending();
@@ -470,7 +310,7 @@ internal static class AssetStoreClient
 		pending.callback = AssetStoreClient.WrapLoginCallback(callback);
 		AssetStoreClient.pending.Add(pending);
 		assetStoreWebClient.Headers.Add("Accept", "application/json");
-		assetStoreWebClient.UploadValuesCompleted += new UploadValuesCompletedEventHandler(AssetStoreClient.UploadValuesCallback);
+		assetStoreWebClient.UploadValuesCompleted += AssetStoreClient.UploadValuesCallback;
 		try
 		{
 			assetStoreWebClient.UploadValuesAsync(address, "POST", nameValueCollection, pending);
@@ -500,7 +340,7 @@ internal static class AssetStoreClient
 			AssetStoreClient.AssetStoreUrl,
 			AssetStoreClient.SavedSessionID,
 			Uri.EscapeDataString(Application.unityVersion),
-			Uri.EscapeDataString("V4.0.7"),
+			Uri.EscapeDataString("V4.1.0"),
 			"26c4202eb475d02864b40827dfff11a14657aa41"
 		}));
 		AssetStoreWebClient assetStoreWebClient = new AssetStoreWebClient();
@@ -510,7 +350,7 @@ internal static class AssetStoreClient
 		pending.callback = AssetStoreClient.WrapLoginCallback(callback);
 		AssetStoreClient.pending.Add(pending);
 		assetStoreWebClient.Headers.Add("Accept", "application/json");
-		assetStoreWebClient.DownloadStringCompleted += new DownloadStringCompletedEventHandler(AssetStoreClient.DownloadStringCallback);
+		assetStoreWebClient.DownloadStringCompleted += AssetStoreClient.DownloadStringCallback;
 		try
 		{
 			assetStoreWebClient.DownloadStringAsync(address, pending);
@@ -547,9 +387,9 @@ internal static class AssetStoreClient
 			else
 			{
 				AssetStoreClient.sLoginState = AssetStoreClient.LoginState.LOGGED_IN;
-				JSONValue jSONValue = JSONParser.SimpleParse(resp.data);
-				AssetStoreClient.ActiveSessionID = jSONValue["xunitysession"].AsString(false);
-				AssetStoreClient.UserIconUrl = jSONValue.Get("keyimage.icon").AsString(false);
+				JSONValue jsonvalue = JSONParser.SimpleParse(resp.data);
+				AssetStoreClient.ActiveSessionID = jsonvalue["xunitysession"].AsString(false);
+				AssetStoreClient.UserIconUrl = jsonvalue.Get("keyimage.icon").AsString(false);
 				if (AssetStoreClient.RememberSession)
 				{
 					AssetStoreClient.SavedSessionID = AssetStoreClient.ActiveSessionID;
@@ -736,24 +576,24 @@ internal static class AssetStoreClient
 
 	private static AssetStoreClient.Pending CreatePending(string name, AssetStoreClient.DoneCallback callback)
 	{
-		foreach (AssetStoreClient.Pending current in AssetStoreClient.pending)
+		foreach (AssetStoreClient.Pending pending in AssetStoreClient.pending)
 		{
-			if (current.id == name)
+			if (pending.id == name)
 			{
 				DebugUtils.Log("CreatePending name conflict!");
 			}
 		}
-		AssetStoreClient.Pending pending = new AssetStoreClient.Pending();
-		pending.id = name;
-		pending.callback = callback;
-		AssetStoreClient.pending.Add(pending);
-		return pending;
+		AssetStoreClient.Pending pending2 = new AssetStoreClient.Pending();
+		pending2.id = name;
+		pending2.callback = callback;
+		AssetStoreClient.pending.Add(pending2);
+		return pending2;
 	}
 
 	public static AssetStoreClient.Pending CreatePendingGet(string name, string path, AssetStoreClient.DoneCallback callback)
 	{
 		AssetStoreClient.Pending p = AssetStoreClient.CreatePending(name, callback);
-		AssetStoreClient.PendingQueueDelegate pendingQueueDelegate = delegate
+		AssetStoreClient.PendingQueueDelegate pendingQueueDelegate = delegate()
 		{
 			p.conn = AssetStoreClient.AcquireClient();
 			if (p.conn == null)
@@ -763,8 +603,8 @@ internal static class AssetStoreClient
 			try
 			{
 				p.conn.Headers.Set("X-Unity-Session", AssetStoreClient.ActiveOrUnauthSessionID);
-				p.conn.DownloadProgressChanged += new DownloadProgressChangedEventHandler(AssetStoreClient.DownloadProgressCallback);
-				p.conn.DownloadStringCompleted += new DownloadStringCompletedEventHandler(AssetStoreClient.DownloadStringCallback);
+				p.conn.DownloadProgressChanged += AssetStoreClient.DownloadProgressCallback;
+				p.conn.DownloadStringCompleted += AssetStoreClient.DownloadStringCallback;
 				p.conn.DownloadStringAsync(AssetStoreClient.APIUri(path), p);
 			}
 			catch (WebException ex)
@@ -784,7 +624,7 @@ internal static class AssetStoreClient
 	public static AssetStoreClient.Pending CreatePendingGetBinary(string name, string url, AssetStoreClient.DoneCallback callback)
 	{
 		AssetStoreClient.Pending p = AssetStoreClient.CreatePending(name, callback);
-		AssetStoreClient.PendingQueueDelegate pendingQueueDelegate = delegate
+		AssetStoreClient.PendingQueueDelegate pendingQueueDelegate = delegate()
 		{
 			p.conn = AssetStoreClient.AcquireClient();
 			if (p.conn == null)
@@ -794,8 +634,8 @@ internal static class AssetStoreClient
 			try
 			{
 				p.conn.Headers.Set("X-Unity-Session", AssetStoreClient.ActiveOrUnauthSessionID);
-				p.conn.DownloadProgressChanged += new DownloadProgressChangedEventHandler(AssetStoreClient.DownloadProgressCallback);
-				p.conn.DownloadDataCompleted += new DownloadDataCompletedEventHandler(AssetStoreClient.DownloadDataCallback);
+				p.conn.DownloadProgressChanged += AssetStoreClient.DownloadProgressCallback;
+				p.conn.DownloadDataCompleted += AssetStoreClient.DownloadDataCallback;
 				p.conn.DownloadDataAsync(new Uri(url), p);
 			}
 			catch (WebException ex)
@@ -815,7 +655,7 @@ internal static class AssetStoreClient
 	public static AssetStoreClient.Pending CreatePendingPost(string name, string path, NameValueCollection param, AssetStoreClient.DoneCallback callback)
 	{
 		AssetStoreClient.Pending p = AssetStoreClient.CreatePending(name, callback);
-		AssetStoreClient.PendingQueueDelegate pendingQueueDelegate = delegate
+		AssetStoreClient.PendingQueueDelegate pendingQueueDelegate = delegate()
 		{
 			p.conn = AssetStoreClient.AcquireClient();
 			if (p.conn == null)
@@ -825,8 +665,8 @@ internal static class AssetStoreClient
 			try
 			{
 				p.conn.Headers.Set("X-Unity-Session", AssetStoreClient.ActiveOrUnauthSessionID);
-				p.conn.UploadProgressChanged += new UploadProgressChangedEventHandler(AssetStoreClient.UploadProgressCallback);
-				p.conn.UploadValuesCompleted += new UploadValuesCompletedEventHandler(AssetStoreClient.UploadValuesCallback);
+				p.conn.UploadProgressChanged += AssetStoreClient.UploadProgressCallback;
+				p.conn.UploadValuesCompleted += AssetStoreClient.UploadValuesCallback;
 				p.conn.UploadValuesAsync(AssetStoreClient.APIUri(path), "POST", param, p);
 			}
 			catch (WebException ex)
@@ -846,7 +686,7 @@ internal static class AssetStoreClient
 	public static AssetStoreClient.Pending CreatePendingPost(string name, string path, string postData, AssetStoreClient.DoneCallback callback)
 	{
 		AssetStoreClient.Pending p = AssetStoreClient.CreatePending(name, callback);
-		AssetStoreClient.PendingQueueDelegate pendingQueueDelegate = delegate
+		AssetStoreClient.PendingQueueDelegate pendingQueueDelegate = delegate()
 		{
 			p.conn = AssetStoreClient.AcquireClient();
 			if (p.conn == null)
@@ -856,8 +696,8 @@ internal static class AssetStoreClient
 			try
 			{
 				p.conn.Headers.Set("X-Unity-Session", AssetStoreClient.ActiveOrUnauthSessionID);
-				p.conn.UploadProgressChanged += new UploadProgressChangedEventHandler(AssetStoreClient.UploadProgressCallback);
-				p.conn.UploadStringCompleted += new UploadStringCompletedEventHandler(AssetStoreClient.UploadStringCallback);
+				p.conn.UploadProgressChanged += AssetStoreClient.UploadProgressCallback;
+				p.conn.UploadStringCompleted += AssetStoreClient.UploadStringCallback;
 				p.conn.UploadStringAsync(AssetStoreClient.APIUri(path), "POST", postData, p);
 			}
 			catch (WebException ex)
@@ -898,8 +738,7 @@ internal static class AssetStoreClient
 				DebugUtils.LogError("Unable to start uploading:" + AssetStoreClient.s_UploadingLargeFile.FilePath + " Reason: " + ex.Message);
 				AssetStoreClient.s_PendingLargeFiles.Remove(AssetStoreClient.s_UploadingLargeFile);
 				AssetStoreClient.s_PendingLargeFiles = null;
-				string result = null;
-				return result;
+				return null;
 			}
 		}
 		AssetStoreClient.LargeFilePending largeFilePending = AssetStoreClient.s_UploadingLargeFile;
@@ -907,11 +746,9 @@ internal static class AssetStoreClient
 		WebResponse webResponse = null;
 		try
 		{
-			string result;
 			if (largeFilePending == null || largeFilePending.Request == null)
 			{
-				result = null;
-				return result;
+				return null;
 			}
 			byte[] buffer = largeFilePending.Buffer;
 			int num = 0;
@@ -941,8 +778,7 @@ internal static class AssetStoreClient
 				{
 					DebugUtils.LogWarning("Progress update error " + ex2.Message);
 				}
-				result = null;
-				return result;
+				return null;
 			}
 			AssetStoreClient.s_PendingLargeFiles.Remove(largeFilePending);
 			AssetStoreClient.s_UploadingLargeFile = null;
@@ -964,8 +800,7 @@ internal static class AssetStoreClient
 			AssetStoreResponse job = AssetStoreClient.parseAssetStoreResponse(text, null, null, webResponse.Headers);
 			largeFilePending.Close();
 			largeFilePending.RequestDoneCallback(job);
-			result = text;
-			return result;
+			return text;
 		}
 		catch (Exception ex4)
 		{
@@ -1009,7 +844,7 @@ internal static class AssetStoreClient
 	{
 		DebugUtils.Log("CreatePendingUpload");
 		AssetStoreClient.Pending p = AssetStoreClient.CreatePending(name, callback);
-		AssetStoreClient.PendingQueueDelegate pendingQueueDelegate = delegate
+		AssetStoreClient.PendingQueueDelegate pendingQueueDelegate = delegate()
 		{
 			p.conn = AssetStoreClient.AcquireClient();
 			if (p.conn == null)
@@ -1019,8 +854,8 @@ internal static class AssetStoreClient
 			try
 			{
 				p.conn.Headers.Set("X-Unity-Session", AssetStoreClient.ActiveOrUnauthSessionID);
-				p.conn.UploadProgressChanged += new UploadProgressChangedEventHandler(AssetStoreClient.UploadProgressCallback);
-				p.conn.UploadFileCompleted += new UploadFileCompletedEventHandler(AssetStoreClient.UploadFileCallback);
+				p.conn.UploadProgressChanged += AssetStoreClient.UploadProgressCallback;
+				p.conn.UploadFileCompleted += AssetStoreClient.UploadFileCallback;
 				p.conn.UploadFileAsync(AssetStoreClient.APIUri(path), "PUT", filepath, p);
 			}
 			catch (WebException ex)
@@ -1195,4 +1030,155 @@ internal static class AssetStoreClient
 		AssetStoreClient.Pending pending = AssetStoreClient.CreatePendingGetBinary(url, url, callback);
 		pending.progressCallback = progress;
 	}
+
+	public const string TOOL_VERSION = "V4.1.0";
+
+	private const string ASSET_STORE_PROD_URL = "https://kharma.unity3d.com";
+
+	private const string UNAUTH_SESSION_ID = "26c4202eb475d02864b40827dfff11a14657aa41";
+
+	private const int kClientPoolSize = 5;
+
+	private const int kSendBufferSize = 32768;
+
+	private static string sActiveSessionIdBackwardsCompatibility;
+
+	private static AssetStoreClient.LoginState sLoginState = AssetStoreClient.LoginState.LOGGED_OUT;
+
+	private static string sLoginErrorMessage = null;
+
+	private static Stack<AssetStoreWebClient> sClientPool;
+
+	private static List<AssetStoreClient.LargeFilePending> s_PendingLargeFiles = new List<AssetStoreClient.LargeFilePending>();
+
+	private static AssetStoreClient.LargeFilePending s_UploadingLargeFile = null;
+
+	private static List<AssetStoreClient.Pending> pending = new List<AssetStoreClient.Pending>();
+
+	private enum LoginState
+	{
+		LOGGED_OUT,
+		IN_PROGRESS,
+		LOGGED_IN,
+		LOGIN_ERROR
+	}
+
+	private class LargeFilePending
+	{
+		public LargeFilePending(string url, string filepath, Dictionary<string, string> extraParams, AssetStoreClient.DoneCallback doneCallback, AssetStoreClient.ProgressCallback progressCallback)
+		{
+			this.Id = filepath;
+			this.URI = url;
+			this.FilePath = filepath;
+			this.RequestDoneCallback = doneCallback;
+			this.RequestProgressCallback = progressCallback;
+			this.m_extraParams = extraParams;
+		}
+
+		public void Open()
+		{
+			try
+			{
+				this.RequestFileStream = new FileStream(this.FilePath, FileMode.Open, FileAccess.Read);
+				this.Request = (HttpWebRequest)WebRequest.Create(AssetStoreClient.APIUri(this.URI, this.m_extraParams));
+				this.Request.AllowWriteStreamBuffering = false;
+				this.Request.Timeout = 36000000;
+				this.Request.Headers.Set("X-Unity-Session", AssetStoreClient.ActiveOrUnauthSessionID);
+				this.Request.KeepAlive = false;
+				this.Request.ContentLength = this.RequestFileStream.Length;
+				this.Request.Method = "PUT";
+				this.BytesToSend = this.RequestFileStream.Length;
+				this.BytesSent = 0L;
+				this.RequestStream = this.Request.GetRequestStream();
+				if (this.Buffer == null)
+				{
+					this.Buffer = new byte[32768];
+				}
+			}
+			catch (Exception ex)
+			{
+				AssetStoreResponse job = AssetStoreClient.parseAssetStoreResponse(null, null, ex, null);
+				this.RequestDoneCallback(job);
+				this.Close();
+				throw ex;
+			}
+		}
+
+		public void Close()
+		{
+			if (this.RequestFileStream != null)
+			{
+				this.RequestFileStream.Close();
+				this.RequestFileStream = null;
+			}
+			if (this.RequestStream != null)
+			{
+				this.RequestStream.Close();
+				this.RequestStream = null;
+			}
+			this.Request = null;
+			this.Buffer = null;
+		}
+
+		public string Id;
+
+		public string FilePath;
+
+		public string URI;
+
+		public FileStream RequestFileStream;
+
+		public HttpWebRequest Request;
+
+		public Stream RequestStream;
+
+		public long BytesToSend;
+
+		public long BytesSent;
+
+		public AssetStoreClient.DoneCallback RequestDoneCallback;
+
+		public AssetStoreClient.ProgressCallback RequestProgressCallback;
+
+		public byte[] Buffer;
+
+		private Dictionary<string, string> m_extraParams;
+	}
+
+	public class Pending
+	{
+		internal AssetStoreClient.PendingQueueDelegate queueDelegate;
+
+		public AssetStoreWebClient conn;
+
+		public Exception ex;
+
+		public string data;
+
+		public byte[] binData;
+
+		public volatile uint bytesReceived;
+
+		public volatile uint totalBytesToReceive;
+
+		public volatile uint bytesSend;
+
+		public volatile uint totalBytesToSend;
+
+		public volatile bool statsUpdated;
+
+		public string id;
+
+		public AssetStoreClient.DoneCallback callback;
+
+		public AssetStoreClient.ProgressCallback progressCallback;
+	}
+
+	public delegate void DoneLoginCallback(string errorMessage);
+
+	internal delegate void DoneCallback(AssetStoreResponse job);
+
+	public delegate void ProgressCallback(double pctUp, double pctDown);
+
+	internal delegate bool PendingQueueDelegate();
 }

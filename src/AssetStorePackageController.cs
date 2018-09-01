@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -6,61 +6,11 @@ using UnityEngine;
 
 internal class AssetStorePackageController
 {
-	private enum AssetsState
+	internal AssetStorePackageController(PackageDataSource packageDataSource)
 	{
-		None,
-		InitiateBuilding,
-		BuildingPackage,
-		UploadingPackage,
-		BuildingMainAssets,
-		UploadingMainAssets,
-		AllUploadsFinished
+		this.m_PkgSelectionCtrl = new PackageSelector(packageDataSource, new ListView<Package>.SelectionCallback(this.OnPackageSelected));
+		this.ClearLocalState();
 	}
-
-	private Package m_Package;
-
-	private Vector2 m_Scroll;
-
-	private PackageSelector m_PkgSelectionCtrl;
-
-	private List<string> m_MainAssets;
-
-	private AssetStorePackageController.AssetsState m_AssetsState;
-
-	private float m_DraftAssetsUploadProgress;
-
-	private string m_DraftAssetsPath;
-
-	private long m_DraftAssetsSize;
-
-	private FileInfo m_DraftAssetsFileInfo;
-
-	private double m_DraftAssetsLastCheckTime;
-
-	private bool m_Dirty;
-
-	private bool m_UnsavedChanges;
-
-	private string m_LocalProjectPath;
-
-	private string m_LocalRootPath;
-
-	private string m_LocalRootGUID;
-
-	private MainAssetsUploadHelper m_MainAssetsUploadHelper;
-
-	private static string[] kForbiddenExtensions = new string[]
-	{
-		".mb",
-		".ma",
-		".max",
-		".c4d",
-		".blend",
-		".3ds",
-		".jas",
-		".dds",
-		".pvr"
-	};
 
 	public bool Dirty
 	{
@@ -82,12 +32,6 @@ internal class AssetStorePackageController
 			this.m_PkgSelectionCtrl.Selected = this.m_Package;
 			this.ClearLocalState();
 		}
-	}
-
-	internal AssetStorePackageController(PackageDataSource packageDataSource)
-	{
-		this.m_PkgSelectionCtrl = new PackageSelector(packageDataSource, new ListView<Package>.SelectionCallback(this.OnPackageSelected));
-		this.ClearLocalState();
 	}
 
 	private bool HasUnsavedChanges()
@@ -343,23 +287,19 @@ internal class AssetStorePackageController
 	private string CheckContent()
 	{
 		string text = string.Empty;
-		string[] gUIDS = this.GetGUIDS(this.NeedProjectSettings());
-		string[] array = gUIDS;
-		for (int i = 0; i < array.Length; i++)
+		string[] guids = this.GetGUIDS(this.NeedProjectSettings());
+		foreach (string text2 in guids)
 		{
-			string guid = array[i];
-			string text2 = AssetDatabase.GUIDToAssetPath(guid);
-			string[] array2 = AssetStorePackageController.kForbiddenExtensions;
-			for (int j = 0; j < array2.Length; j++)
+			string text3 = AssetDatabase.GUIDToAssetPath(text2);
+			foreach (string value in AssetStorePackageController.kForbiddenExtensions)
 			{
-				string value = array2[j];
-				if (text2.EndsWith(value))
+				if (text3.EndsWith(value))
 				{
 					if (text != string.Empty)
 					{
 						text += "\n";
 					}
-					text = text + "Unallowed file type: " + text2;
+					text = text + "Unallowed file type: " + text3;
 				}
 			}
 		}
@@ -375,60 +315,56 @@ internal class AssetStorePackageController
 	{
 		File.Delete(toPath);
 		this.m_AssetsState = AssetStorePackageController.AssetsState.BuildingPackage;
-		Packager.ExportPackage(this.GetGUIDS(this.NeedProjectSettings()), toPath);
+		Packager.ExportPackage(this.GetGUIDS(this.NeedProjectSettings()), toPath, this.NeedProjectSettings());
 	}
 
 	private static string GetLocalRootGUID(Package package)
 	{
-		string path = ("Assets" + (package.RootPath ?? string.Empty)).Trim(new char[]
+		string text = ("Assets" + (package.RootPath ?? string.Empty)).Trim(new char[]
 		{
 			'/'
 		});
-		return AssetDatabase.AssetPathToGUID(path);
+		return AssetDatabase.AssetPathToGUID(text);
 	}
 
-    private string[] GetGUIDS(bool includeProjectSettings)
-    {
-        string[] collection = new string[0];
-        string text = ("Assets" + (this.m_LocalRootPath ?? string.Empty)).Trim(new char[]
-        {
-            '/'
-        });
-        string guid = AssetDatabase.AssetPathToGUID(text);
-        string[] guids = Packager.CollectAllChildren(guid, collection);
-        string[] array = Packager.BuildExportPackageAssetListGuids(guids, true);
-        List<string> list = new List<string>();
-        string value = text.ToLower();
-        string[] array2 = array;
-        for (int i = 0; i < array2.Length; i++)
-        {
-            string text2 = array2[i];
-            string text3 = AssetDatabase.GUIDToAssetPath(text2).ToLower();
-            if (text3.StartsWith("assets/plugins") || text3.Contains("standard assets") || text3.StartsWith(value))
-            {
-                list.Add(text2);
-            }
-        }
-        if (includeProjectSettings)
-        {
-            string[] files = Directory.GetFiles("ProjectSettings");
-            string[] array3 = files;
-            for (int j = 0; j < array3.Length; j++)
-            {
-                string text4 = array3[j];
-                string text5 = AssetDatabase.AssetPathToGUID(text4);
-                if (text5.Length > 0)
-                {
-                    list.Add(text5);
-                }
-            }
-        }
-        string[] array4 = new string[list.Count];
-        list.CopyTo(array4);
-        return array4;
-    }
+	private string[] GetGUIDS(bool includeProjectSettings)
+	{
+		string[] collection = new string[0];
+		string text = ("Assets" + (this.m_LocalRootPath ?? string.Empty)).Trim(new char[]
+		{
+			'/'
+		});
+		string guid = AssetDatabase.AssetPathToGUID(text);
+		string[] guids = Packager.CollectAllChildren(guid, collection);
+		string[] array = Packager.BuildExportPackageAssetListGuids(guids, true);
+		List<string> list = new List<string>();
+		string value = text.ToLower();
+		foreach (string text2 in array)
+		{
+			string text3 = AssetDatabase.GUIDToAssetPath(text2).ToLower();
+			if (text3.StartsWith("assets/plugins") || text3.Contains("standard assets") || text3.StartsWith(value))
+			{
+				list.Add(text2);
+			}
+		}
+		if (includeProjectSettings)
+		{
+			string[] files = Directory.GetFiles("ProjectSettings");
+			foreach (string text4 in files)
+			{
+				string text5 = AssetDatabase.AssetPathToGUID(text4);
+				if (text5.Length > 0)
+				{
+					list.Add(text5);
+				}
+			}
+		}
+		string[] array4 = new string[list.Count];
+		list.CopyTo(array4);
+		return array4;
+	}
 
-    private static bool CancelableProgressBar(float progress, string message, string buttonText)
+	private static bool CancelableProgressBar(float progress, string message, string buttonText)
 	{
 		Rect rect = GUILayoutUtility.GetRect(200f, 19f);
 		EditorGUI.ProgressBar(rect, progress, message);
@@ -490,7 +426,7 @@ internal class AssetStorePackageController
 			}
 			return;
 		}
-		if (false/*MainAssetsUtil.CanGenerateBundles*/)
+		if (MainAssetsUtil.CanGenerateBundles)
 		{
 			this.UploadAssetBundles();
 		}
@@ -626,9 +562,9 @@ internal class AssetStorePackageController
 		this.SelectedPackage = null;
 		List<Package> list = new List<Package>();
 		IList<Package> allPackages = assetStoreManager.packageDataSource.GetAllPackages();
-		foreach (Package current in allPackages)
+		foreach (Package item in allPackages)
 		{
-			list.Add(current);
+			list.Add(item);
 		}
 		list.RemoveAll((Package pc) => string.IsNullOrEmpty(pc.RootGUID) || pc.RootGUID != AssetStorePackageController.GetLocalRootGUID(pc));
 		if (list.Count == 1)
@@ -638,9 +574,9 @@ internal class AssetStorePackageController
 		}
 		if (list.Count == 0)
 		{
-			foreach (Package current2 in allPackages)
+			foreach (Package item2 in allPackages)
 			{
-				list.Add(current2);
+				list.Add(item2);
 			}
 		}
 		list.RemoveAll((Package pc) => pc.RootPath == null || (Application.dataPath != pc.ProjectPath && !Directory.Exists(Application.dataPath + pc.RootPath)));
@@ -653,11 +589,11 @@ internal class AssetStorePackageController
 		{
 			return;
 		}
-		foreach (Package current3 in list)
+		foreach (Package package in list)
 		{
-			if (current3.RootPath != null && Directory.Exists(Application.dataPath + current3.RootPath) && Application.dataPath == current3.ProjectPath)
+			if (package.RootPath != null && Directory.Exists(Application.dataPath + package.RootPath) && Application.dataPath == package.ProjectPath)
 			{
-				this.SelectedPackage = current3;
+				this.SelectedPackage = package;
 				return;
 			}
 		}
@@ -665,11 +601,11 @@ internal class AssetStorePackageController
 		{
 			return;
 		}
-		foreach (Package current4 in list)
+		foreach (Package package2 in list)
 		{
-			if (current4.RootPath != null && Directory.Exists(Application.dataPath + current4.RootPath))
+			if (package2.RootPath != null && Directory.Exists(Application.dataPath + package2.RootPath))
 			{
-				this.SelectedPackage = current4;
+				this.SelectedPackage = package2;
 				return;
 			}
 		}
@@ -677,11 +613,11 @@ internal class AssetStorePackageController
 		{
 			return;
 		}
-		foreach (Package current5 in list)
+		foreach (Package package3 in list)
 		{
-			if (current5.ProjectPath != null && current5.ProjectPath == Application.dataPath)
+			if (package3.ProjectPath != null && package3.ProjectPath == Application.dataPath)
 			{
-				this.SelectedPackage = current5;
+				this.SelectedPackage = package3;
 				break;
 			}
 		}
@@ -701,5 +637,61 @@ internal class AssetStorePackageController
 	private void RenderPackageSelection()
 	{
 		this.m_PkgSelectionCtrl.Render(200);
+	}
+
+	private Package m_Package;
+
+	private Vector2 m_Scroll;
+
+	private PackageSelector m_PkgSelectionCtrl;
+
+	private List<string> m_MainAssets;
+
+	private AssetStorePackageController.AssetsState m_AssetsState;
+
+	private float m_DraftAssetsUploadProgress;
+
+	private string m_DraftAssetsPath;
+
+	private long m_DraftAssetsSize;
+
+	private FileInfo m_DraftAssetsFileInfo;
+
+	private double m_DraftAssetsLastCheckTime;
+
+	private bool m_Dirty;
+
+	private bool m_UnsavedChanges;
+
+	private string m_LocalProjectPath;
+
+	private string m_LocalRootPath;
+
+	private string m_LocalRootGUID;
+
+	private MainAssetsUploadHelper m_MainAssetsUploadHelper;
+
+	private static string[] kForbiddenExtensions = new string[]
+	{
+		".mb",
+		".ma",
+		".max",
+		".c4d",
+		".blend",
+		".3ds",
+		".jas",
+		".dds",
+		".pvr"
+	};
+
+	private enum AssetsState
+	{
+		None,
+		InitiateBuilding,
+		BuildingPackage,
+		UploadingPackage,
+		BuildingMainAssets,
+		UploadingMainAssets,
+		AllUploadsFinished
 	}
 }
