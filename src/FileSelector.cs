@@ -470,7 +470,7 @@ If you are uploading a Character, the Character prefab would be a good candidate
 			{
 				GUILayout.Height(21f)
 			});
-			GUILayout.FlexibleSpace();
+			//CHANGED: remove flexible space for proper positions of + - button
 		}
 
 		private static IComparer<FileSelector.FileNode> alphabeticalComparer = new FileSelector.AlphabeticComparer();
