@@ -1,44 +1,9 @@
-using System;
+﻿using System;
 using UnityEditor;
 using UnityEngine;
 
 internal static class GUIUtil
 {
-	public class GUIStyles
-	{
-		internal readonly GUIStyle delimiter = "GroupBox";
-
-		internal readonly GUIStyle verticalDelimiter = "GroupBox";
-
-		internal readonly GUIStyle dimmedTextArea;
-
-		internal GUIStyles()
-		{
-			this.delimiter = new GUIStyle(this.delimiter);
-			this.delimiter.margin = new RectOffset(0, 0, 0, 0);
-			this.delimiter.padding = new RectOffset(0, 0, 0, 0);
-			this.delimiter.border = new RectOffset(0, 0, 1, 0);
-			this.delimiter.fixedHeight = 1f;
-			this.verticalDelimiter = new GUIStyle(this.verticalDelimiter);
-			this.verticalDelimiter.margin = new RectOffset(0, 0, 0, 0);
-			this.verticalDelimiter.padding = new RectOffset(0, 0, 0, 0);
-			this.verticalDelimiter.border = new RectOffset(1, 0, 0, 0);
-			this.verticalDelimiter.fixedWidth = 1f;
-			this.dimmedTextArea = new GUIStyle(GUI.skin.textArea);
-			this.dimmedTextArea.normal.textColor = Color.gray;
-		}
-	}
-
-	private static GUIUtil.GUIStyles s_Styles;
-
-	private static Texture2D sLogo;
-
-	private static GUIContent sNotice;
-
-	private static Texture2D sIconWarningSmall;
-
-	private static GUIContent[] sStatusWheel;
-
 	public static GUIUtil.GUIStyles Styles
 	{
 		get
@@ -78,6 +43,12 @@ internal static class GUIUtil
 		}
 	}
 
+	private static Texture2D LoadRequiredIcon(string name)
+	{
+		Texture2D texture2D = EditorGUIUtility.Load("Icons/" + name) as Texture2D;
+		return (!(texture2D != null)) ? (EditorGUIUtility.LoadRequired("Builtin Skins/Icons/" + name) as Texture2D) : texture2D;
+	}
+
 	public static Texture2D WarningIcon
 	{
 		get
@@ -99,9 +70,9 @@ internal static class GUIUtil
 				GUIUtil.sStatusWheel = new GUIContent[12];
 				for (int i = 0; i < 12; i++)
 				{
-					GUIContent gUIContent = new GUIContent();
-					gUIContent.image = GUIUtil.LoadRequiredIcon("WaitSpin" + i.ToString("00") + ".png");
-					GUIUtil.sStatusWheel[i] = gUIContent;
+					GUIContent guicontent = new GUIContent();
+					guicontent.image = GUIUtil.LoadRequiredIcon("WaitSpin" + i.ToString("00") + ".png");
+					GUIUtil.sStatusWheel[i] = guicontent;
 				}
 			}
 			int num = (int)Mathf.Repeat(Time.realtimeSinceStartup * 10f, 11.99f);
@@ -109,24 +80,53 @@ internal static class GUIUtil
 		}
 	}
 
-	private static Texture2D LoadRequiredIcon(string name)
-	{
-		Texture2D texture2D = EditorGUIUtility.Load("Icons/" + name) as Texture2D;
-		return (!(texture2D != null)) ? (EditorGUIUtility.LoadRequired("Builtin Skins/Icons/" + name) as Texture2D) : texture2D;
-	}
-
 	public static Rect RectOnRect(float width, float height, Rect target)
 	{
-		float num = target.x;
+		float x = target.x;
 		if (target.width >= width)
 		{
-			num += (target.width - width) * 0.5f;
+			x += (target.width - width) * 0.5f;
 		}
 		float y = 100f;
 		if (target.height >= height)
 		{
 			y = target.y;
 		}
-		return new Rect(num, y, width, height);
+		return new Rect(x, y, width, height);
+	}
+
+	private static GUIUtil.GUIStyles s_Styles;
+
+	private static Texture2D sLogo;
+
+	private static GUIContent sNotice;
+
+	private static Texture2D sIconWarningSmall;
+
+	private static GUIContent[] sStatusWheel;
+
+	public class GUIStyles
+	{
+		internal GUIStyles()
+		{
+			this.delimiter = new GUIStyle(this.delimiter);
+			this.delimiter.margin = new RectOffset(0, 0, 0, 0);
+			this.delimiter.padding = new RectOffset(0, 0, 0, 0);
+			this.delimiter.border = new RectOffset(0, 0, 1, 0);
+			this.delimiter.fixedHeight = 1f;
+			this.verticalDelimiter = new GUIStyle(this.verticalDelimiter);
+			this.verticalDelimiter.margin = new RectOffset(0, 0, 0, 0);
+			this.verticalDelimiter.padding = new RectOffset(0, 0, 0, 0);
+			this.verticalDelimiter.border = new RectOffset(1, 0, 0, 0);
+			this.verticalDelimiter.fixedWidth = 1f;
+			this.dimmedTextArea = new GUIStyle(GUI.skin.textArea);
+			this.dimmedTextArea.normal.textColor = Color.gray;
+		}
+
+		internal readonly GUIStyle delimiter = "GroupBox";
+
+		internal readonly GUIStyle verticalDelimiter = "GroupBox";
+
+		internal readonly GUIStyle dimmedTextArea;
 	}
 }
