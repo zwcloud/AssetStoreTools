@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -7,9 +7,9 @@ public class BackwardsCompatibilityUtility
 	public static MethodInfo GetMethodInfo(List<string> methods, Type[] parametersType = null)
 	{
 		MethodInfo methodInfo = null;
-		foreach (string current in methods)
+		foreach (string text in methods)
 		{
-			string[] array = current.Split(new char[]
+			string[] array = text.Split(new char[]
 			{
 				'.'
 			});

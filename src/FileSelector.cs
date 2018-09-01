@@ -219,18 +219,18 @@ public class FileSelector : EditorWindow
 	public void SelectFiles(IList<string> toBeSelected)
 	{
 		this.m_SelectedFiles = this.GetFileListByName(toBeSelected);
-		foreach (FileSelector.FileNode current in this.m_SelectedFiles)
+		foreach (FileSelector.FileNode fileNode in this.m_SelectedFiles)
 		{
-			current.Selected = true;
+			fileNode.Selected = true;
 		}
 	}
 
 	public void Accept()
 	{
 		List<string> list = new List<string>();
-		foreach (FileSelector.FileNode current in this.m_SelectedFiles)
+		foreach (FileSelector.FileNode fileNode in this.m_SelectedFiles)
 		{
-			list.Add(current.Name);
+			list.Add(fileNode.Name);
 		}
 		this.m_OnFinishSelecting(list);
 		base.Close();
@@ -249,9 +249,9 @@ public class FileSelector : EditorWindow
 			linkedList3.Clear();
 			if (first.Value.isDirectory)
 			{
-				foreach (FileSelector.FileNode current in first.Value.Childrens)
+				foreach (FileSelector.FileNode value in first.Value.Childrens)
 				{
-					linkedList3.AddFirst(current);
+					linkedList3.AddFirst(value);
 				}
 			}
 			else
@@ -271,9 +271,9 @@ public class FileSelector : EditorWindow
 				}
 			}
 			linkedList2.RemoveFirst();
-			foreach (FileSelector.FileNode current2 in linkedList3)
+			foreach (FileSelector.FileNode value2 in linkedList3)
 			{
-				linkedList2.AddFirst(current2);
+				linkedList2.AddFirst(value2);
 			}
 		}
 		return linkedList;
@@ -317,28 +317,28 @@ public class FileSelector : EditorWindow
 	{
 		LinkedList<FileSelector.FileNode> linkedList = new LinkedList<FileSelector.FileNode>();
 		linkedList.AddFirst(this.m_RootDir);
-        LinkedList<FileSelector.FileNode> linkedList2 = new LinkedList<FileSelector.FileNode>();
+		LinkedList<FileSelector.FileNode> linkedList2 = new LinkedList<FileSelector.FileNode>();
 
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Expand all"))
-        {
-            foreach (var fileNode in linkedList)
-            {
-                ExpandNode(fileNode, true);
-            }
-        }
+		GUILayout.BeginHorizontal();
+		if (GUILayout.Button("Expand all"))
+		{
+		    foreach (var fileNode in linkedList)
+		    {
+			ExpandNode(fileNode, true);
+		    }
+		}
 
-        if (GUILayout.Button("Collapse all"))
-        {
-            foreach (var fileNode in linkedList)
-            {
-                ExpandNode(fileNode, false);
-            }
-        }
+		if (GUILayout.Button("Collapse all"))
+		{
+		    foreach (var fileNode in linkedList)
+		    {
+			ExpandNode(fileNode, false);
+		    }
+		}
 
-        GUILayout.EndHorizontal();
+		GUILayout.EndHorizontal();
 
-        while (linkedList.Count > 0)
+		while (linkedList.Count > 0)
 		{
 			LinkedListNode<FileSelector.FileNode> first = linkedList.First;
 			linkedList2.Clear();
@@ -346,8 +346,8 @@ public class FileSelector : EditorWindow
 			GUILayout.Space((float)(20 * first.Value.Depth));
 			if (first.Value.isDirectory)
 			{
-                GUIStyle style = "IN foldout";
-                first.Value.Expanded = GUILayout.Toggle(first.Value.Expanded, GUIContent.none, style);
+				GUIStyle guistyle = "IN foldout";
+				first.Value.Expanded = GUILayout.Toggle(first.Value.Expanded, GUIContent.none, guistyle, new GUILayoutOption[0]);
 			}
 			else
 			{
@@ -386,19 +386,19 @@ public class FileSelector : EditorWindow
             GUILayout.EndHorizontal();
 			if (first.Value.Expanded)
 			{
-				foreach (FileSelector.FileNode current in first.Value.SubDirectories)
+				foreach (FileSelector.FileNode value in first.Value.SubDirectories)
 				{
-					linkedList2.AddFirst(current);
+					linkedList2.AddFirst(value);
 				}
-				foreach (FileSelector.FileNode current2 in first.Value.Files)
+				foreach (FileSelector.FileNode value2 in first.Value.Files)
 				{
-					linkedList2.AddFirst(current2);
+					linkedList2.AddFirst(value2);
 				}
 			}
 			linkedList.RemoveFirst();
-			foreach (FileSelector.FileNode current3 in linkedList2)
+			foreach (FileSelector.FileNode value3 in linkedList2)
 			{
-				linkedList.AddFirst(current3);
+				linkedList.AddFirst(value3);
 			}
 		}
 	}
@@ -412,9 +412,9 @@ public class FileSelector : EditorWindow
 			GUILayout.BeginHorizontal(new GUILayoutOption[0]);
 			value.Selected = GUILayout.Toggle(value.Selected, GUIContent.none, new GUILayoutOption[0]);
 			value.RenderIconText();
-            GUILayout.FlexibleSpace();
+			GUILayout.FlexibleSpace();
 
-            if (MainAssetsUtil.CanPreview && GUILayout.Button("Preview", new GUILayoutOption[0]))
+			if (MainAssetsUtil.CanPreview && GUILayout.Button("Preview", new GUILayoutOption[0]))
 			{
 				MainAssetsUtil.Preview(value.Name);
 			}

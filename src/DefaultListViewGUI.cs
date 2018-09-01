@@ -1,29 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 internal class DefaultListViewGUI<T> : IListViewGUI<T>
 {
-	private class GUIStyles
-	{
-		internal GUIStyle ListNodeTextField = new GUIStyle("PR Label");
-
-		internal GUIStyle VerticalScrollBar = "verticalScrollbar";
-
-		internal GUIStyle HorizontalScrollbar = "horizontalScrollbar";
-
-		public GUIStyles()
-		{
-			this.ListNodeTextField.alignment = TextAnchor.MiddleLeft;
-			this.ListNodeTextField.padding.top = 2;
-			this.ListNodeTextField.padding.bottom = 2;
-		}
-	}
-
-	private static DefaultListViewGUI<T>.GUIStyles s_Styles;
-
-	protected int m_HeightOffset;
-
 	private static DefaultListViewGUI<T>.GUIStyles Styles
 	{
 		get
@@ -48,13 +28,13 @@ internal class DefaultListViewGUI<T> : IListViewGUI<T>
 		Vector2 nodeArea = this.GetNodeArea(node);
 		Rect rect = new Rect(0f, (float)this.m_HeightOffset, contentSize.x, nodeArea.y);
 		this.m_HeightOffset += (int)rect.height;
-		if (Event.current.type == EventType.Repaint)
+		if (Event.current.type == (EventType)7)
 		{
-			GUIContent gUIContent = new GUIContent(string.Empty);
+			GUIContent guicontent = new GUIContent(string.Empty);
 			GUIStyle lineStyle = this.GetLineStyle();
-			gUIContent.text = this.GetDisplayName(node);
-			gUIContent.image = this.GetDisplayIcon(node);
-			lineStyle.Draw(rect, gUIContent, false, selected, selected, focus);
+			guicontent.text = this.GetDisplayName(node);
+			guicontent.image = this.GetDisplayIcon(node);
+			lineStyle.Draw(rect, guicontent, false, selected, selected, focus);
 		}
 		return rect;
 	}
@@ -118,5 +98,25 @@ internal class DefaultListViewGUI<T> : IListViewGUI<T>
 			}
 		}
 		return result;
+	}
+
+	private static DefaultListViewGUI<T>.GUIStyles s_Styles;
+
+	protected int m_HeightOffset;
+
+	private class GUIStyles
+	{
+		public GUIStyles()
+		{
+			this.ListNodeTextField.alignment = (TextAnchor)3;
+			this.ListNodeTextField.padding.top = 2;
+			this.ListNodeTextField.padding.bottom = 2;
+		}
+
+		internal GUIStyle ListNodeTextField = new GUIStyle("PR Label");
+
+		internal GUIStyle VerticalScrollBar = "verticalScrollbar";
+
+		internal GUIStyle HorizontalScrollbar = "horizontalScrollbar";
 	}
 }

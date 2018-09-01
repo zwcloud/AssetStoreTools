@@ -1,8 +1,16 @@
-using System;
+﻿using System;
 using System.Net;
 
 internal struct AssetStoreResponse
 {
+	public bool failed
+	{
+		get
+		{
+			return !this.ok;
+		}
+	}
+
 	public int HttpStatusCode;
 
 	public string HttpErrorMessage;
@@ -14,12 +22,4 @@ internal struct AssetStoreResponse
 	public byte[] binData;
 
 	public bool ok;
-
-	public bool failed
-	{
-		get
-		{
-			return !this.ok;
-		}
-	}
 }

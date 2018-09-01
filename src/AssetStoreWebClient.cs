@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 
 internal class AssetStoreWebClient : WebClient
