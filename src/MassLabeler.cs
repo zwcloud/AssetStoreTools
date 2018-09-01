@@ -1,20 +1,22 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 internal class MassLabeler : EditorWindow
 {
-	private const string kLabelListPath = "Assets/AssetStoreTools/Labels.asset";
+	[MenuItem("Asset Store Tools/Mass Labeler", false, 1000)]
+	public static void Launch()
+	{
+		EditorWindow.GetWindow(typeof(MassLabeler)).Show();
+	}
 
-	private static LabelList m_Labels;
-
-	private string m_LabelAdditionField = string.Empty;
-
-	private Dictionary<int, object> m_CheckedLabels = new Dictionary<int, object>();
-
-	private Vector2 m_ListScroll = Vector2.zero;
+	private void OnEnable()
+	{
+		this.UpdateLabelSelection();
+	}
 
 	private static LabelList Labels
 	{
@@ -46,17 +48,6 @@ internal class MassLabeler : EditorWindow
 		}
 	}
 
-	[MenuItem("Asset Store Tools/Mass Labeler", false, 1000)]
-	public static void Launch()
-	{
-		EditorWindow.GetWindow(typeof(MassLabeler)).Show();
-	}
-
-	private void OnEnable()
-	{
-		this.UpdateLabelSelection();
-	}
-
 	private void OnSelectionChange()
 	{
 		this.UpdateLabelSelection();
@@ -65,15 +56,11 @@ internal class MassLabeler : EditorWindow
 	private void UpdateLabelSelection()
 	{
 		this.m_CheckedLabels = new Dictionary<int, object>();
-		UnityEngine.Object[] objects = Selection.objects;
-		for (int i = 0; i < objects.Length; i++)
+		foreach (Object @object in Selection.objects)
 		{
-			UnityEngine.Object obj = objects[i];
-			string[] labels = AssetDatabase.GetLabels(obj);
-			string[] array = labels;
-			for (int j = 0; j < array.Length; j++)
+			string[] labels = AssetDatabase.GetLabels(@object);
+			foreach (string label in labels)
 			{
-				string label = array[j];
 				MassLabeler.Labels.Add(label);
 				this.m_CheckedLabels[MassLabeler.Labels.IndexOf(label)] = null;
 			}
@@ -84,14 +71,12 @@ internal class MassLabeler : EditorWindow
 	private void ApplyLabels()
 	{
 		List<string> list = new List<string>();
-		foreach (int current in this.m_CheckedLabels.Keys)
+		foreach (int index in this.m_CheckedLabels.Keys)
 		{
-			list.Add(MassLabeler.Labels[current]);
+			list.Add(MassLabeler.Labels[index]);
 		}
-		UnityEngine.Object[] objects = Selection.objects;
-		for (int i = 0; i < objects.Length; i++)
+		foreach (Object @object in Selection.objects)
 		{
-			UnityEngine.Object @object = objects[i];
 			AssetDatabase.SetLabels(@object, list.ToArray());
 			EditorUtility.SetDirty(@object);
 		}
@@ -160,4 +145,14 @@ internal class MassLabeler : EditorWindow
 			GUILayout.EndHorizontal();
 		}
 	}
+
+	private const string kLabelListPath = "Assets/AssetStoreTools/Labels.asset";
+
+	private static LabelList m_Labels;
+
+	private string m_LabelAdditionField = string.Empty;
+
+	private Dictionary<int, object> m_CheckedLabels = new Dictionary<int, object>();
+
+	private Vector2 m_ListScroll = Vector2.zero;
 }

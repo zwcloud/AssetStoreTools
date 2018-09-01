@@ -1,28 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 internal class MainAssetsUploadHelper
 {
-	private readonly AssetStorePackageController m_AssetStorePackageController;
-
-	private readonly Action<string> m_OnUploadAssetBundlesFinished;
-
-	private readonly List<string> m_MainAssets;
-
-	private Dictionary<string, string> m_AssetBundleFiles;
-
-	private List<string> m_PendingUploadsAssetPath;
-
-	private List<double> m_MainAssetsProgress;
-
-	private string m_ErrorMessages;
-
-	private double m_CachedProgressValue;
-
-	private bool m_ProgressDirty;
-
 	public MainAssetsUploadHelper(AssetStorePackageController assetStorePackageController, List<string> mainAssets, Action<string> onUploadAssetBundlesFinished)
 	{
 		this.m_AssetStorePackageController = assetStorePackageController;
@@ -33,17 +15,17 @@ internal class MainAssetsUploadHelper
 	public void GenerateAssetBundles()
 	{
 		this.m_AssetBundleFiles = new Dictionary<string, string>();
-		foreach (string current in this.m_MainAssets)
+		foreach (string text in this.m_MainAssets)
 		{
-			DebugUtils.Log("processing: " + current);
-			string text = MainAssetsUtil.CreateBundle(current);
-			if (text == null)
+			DebugUtils.Log("processing: " + text);
+			string text2 = MainAssetsUtil.CreateBundle(text);
+			if (text2 == null)
 			{
-				DebugUtils.LogWarning(string.Format("Unable to Create Preview for: {0}", current));
+				DebugUtils.LogWarning(string.Format("Unable to Create Preview for: {0}", text));
 			}
 			else
 			{
-				this.m_AssetBundleFiles.Add(current, text);
+				this.m_AssetBundleFiles.Add(text, text2);
 			}
 		}
 	}
@@ -55,11 +37,11 @@ internal class MainAssetsUploadHelper
 		this.m_ErrorMessages = null;
 		this.m_ProgressDirty = false;
 		this.m_CachedProgressValue = 0.0;
-		foreach (string current in this.m_PendingUploadsAssetPath)
+		foreach (string text in this.m_PendingUploadsAssetPath)
 		{
-			string filepath = this.m_AssetBundleFiles[current];
-			string uploadBundlePath = AssetStoreAPI.GetUploadBundlePath(this.m_AssetStorePackageController.SelectedPackage, current);
-			AssetStoreAPI.UploadBundle(uploadBundlePath, filepath, new AssetStoreAPI.UploadBundleCallback(this.OnFinishUploadBundle), this.OnBundleProgress(current));
+			string filepath = this.m_AssetBundleFiles[text];
+			string uploadBundlePath = AssetStoreAPI.GetUploadBundlePath(this.m_AssetStorePackageController.SelectedPackage, text);
+			AssetStoreAPI.UploadBundle(uploadBundlePath, filepath, new AssetStoreAPI.UploadBundleCallback(this.OnFinishUploadBundle), this.OnBundleProgress(text));
 			this.m_MainAssetsProgress.Add(0.0);
 		}
 	}
@@ -103,4 +85,22 @@ internal class MainAssetsUploadHelper
 		}
 		return this.m_CachedProgressValue;
 	}
+
+	private readonly AssetStorePackageController m_AssetStorePackageController;
+
+	private readonly Action<string> m_OnUploadAssetBundlesFinished;
+
+	private readonly List<string> m_MainAssets;
+
+	private Dictionary<string, string> m_AssetBundleFiles;
+
+	private List<string> m_PendingUploadsAssetPath;
+
+	private List<double> m_MainAssetsProgress;
+
+	private string m_ErrorMessages;
+
+	private double m_CachedProgressValue;
+
+	private bool m_ProgressDirty;
 }

@@ -1,15 +1,14 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public static class MainAssetsUtil
 {
-	private static IAssetBundler s_Bundler;
-
 	private static IAssetBundler Bundler
 	{
 		get
@@ -66,11 +65,9 @@ public static class MainAssetsUtil
 		Type type2 = module.GetType("UnityEngine.ProceduralMaterial");
 		if (type != null && type2 != null && type.IsInstanceOfType(@object))
 		{
-			UnityEngine.Object[] array = AssetDatabase.LoadAllAssetsAtPath(mainAssetPath);
-			UnityEngine.Object[] array2 = array;
-			for (int i = 0; i < array2.Length; i++)
+			Object[] array = AssetDatabase.LoadAllAssetsAtPath(mainAssetPath);
+			foreach (Object object2 in array)
 			{
-				UnityEngine.Object object2 = array2[i];
 				if (type2.IsInstanceOfType(object2))
 				{
 					@object = object2;
@@ -107,10 +104,8 @@ public static class MainAssetsUtil
 	{
 		List<string> list = new List<string>();
 		string[] files = Directory.GetFiles(Application.dataPath + folder);
-		string[] array = files;
-		for (int i = 0; i < array.Length; i++)
+		foreach (string text in files)
 		{
-			string text = array[i];
 			bool flag = false;
 			string text2 = text.Substring(Application.dataPath.Length + 1);
 			text2 = text2.Replace("\\", "/");
@@ -122,10 +117,8 @@ public static class MainAssetsUtil
 				if (!(@object == null))
 				{
 					string[] labels = AssetDatabase.GetLabels(@object);
-					string[] array2 = labels;
-					for (int j = 0; j < array2.Length; j++)
+					foreach (string a in labels)
 					{
-						string a = array2[j];
 						if (a == "MainAsset")
 						{
 							flag = true;
@@ -140,14 +133,14 @@ public static class MainAssetsUtil
 			}
 		}
 		string[] directories = Directory.GetDirectories(Application.dataPath + folder);
-		string[] array3 = directories;
-		for (int k = 0; k < array3.Length; k++)
+		foreach (string text3 in directories)
 		{
-			string text3 = array3[k];
 			string folder2 = text3.Substring(Application.dataPath.Length);
 			List<string> mainAssetsByTag = MainAssetsUtil.GetMainAssetsByTag(folder2);
 			list.AddRange(mainAssetsByTag);
 		}
 		return list;
 	}
+
+	private static IAssetBundler s_Bundler;
 }

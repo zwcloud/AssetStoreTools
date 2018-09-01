@@ -1,38 +1,10 @@
-using System;
+﻿using System;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
 internal class LoginWindow : EditorWindow
 {
-	public delegate void LoginCallback(string errorMessage);
-
-	public const float kDefaultWidth = 360f;
-
-	public const float kDefaultHeight = 140f;
-
-	private const float kBaseHeight = 110f;
-
-	public static bool IsVisible;
-
-	private string m_LoginReason;
-
-	private string m_LoginRemoteMessage;
-
-	private string m_Username = string.Empty;
-
-	private string m_Password = string.Empty;
-
-	private LoginWindow.LoginCallback m_LoginCallback;
-
-	public static bool IsLoggedIn
-	{
-		get
-		{
-			return AssetStoreClient.HasActiveSessionID;
-		}
-	}
-
 	public static void Login(string loginReason, LoginWindow.LoginCallback callback)
 	{
 		LoginWindow.Login(loginReason, callback, new Rect(100f, 100f, 360f, 140f));
@@ -65,6 +37,14 @@ internal class LoginWindow : EditorWindow
 	public static void Logout()
 	{
 		AssetStoreClient.Logout();
+	}
+
+	public static bool IsLoggedIn
+	{
+		get
+		{
+			return AssetStoreClient.HasActiveSessionID;
+		}
 	}
 
 	public static void ShowLoginWindow(string loginReason, LoginWindow.LoginCallback callback)
@@ -225,4 +205,24 @@ internal class LoginWindow : EditorWindow
 			}
 		});
 	}
+
+	public const float kDefaultWidth = 360f;
+
+	public const float kDefaultHeight = 140f;
+
+	private const float kBaseHeight = 110f;
+
+	public static bool IsVisible;
+
+	private string m_LoginReason;
+
+	private string m_LoginRemoteMessage;
+
+	private string m_Username = string.Empty;
+
+	private string m_Password = string.Empty;
+
+	private LoginWindow.LoginCallback m_LoginCallback;
+
+	public delegate void LoginCallback(string errorMessage);
 }
