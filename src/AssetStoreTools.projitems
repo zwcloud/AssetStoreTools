@@ -44,6 +44,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)PackageListGUI.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Packager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PackageSelector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UnityEditor\AssetServer.cs" />
   </ItemGroup>
 </Project>
