@@ -30,7 +30,7 @@
     <DefineConstants>UNITY_5;UNITY_5_6;UNITY_5_6_6;UNITY_5_6_OR_NEWER</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <DefineConstants>UNITY_5_5_0</DefineConstants>
+    <DefineConstants>UNITY_5;UNITY_5_6;UNITY_5_6_6;UNITY_5_6_OR_NEWER</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
