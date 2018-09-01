@@ -426,14 +426,8 @@ internal class AssetStorePackageController
 			}
 			return;
 		}
-		if (MainAssetsUtil.CanGenerateBundles)
-		{
-			this.UploadAssetBundles();
-		}
-		else
-		{
-			this.OnUploadSuccessfull();
-		}
+        //CHANGED: Don't call MainAssetsUtil.CanGenerateBundles to remove the second messed progress bar.
+		this.OnUploadSuccessfull();
 	}
 
 	private void OnAssetsUploading(double pctUp, double pctDown)
