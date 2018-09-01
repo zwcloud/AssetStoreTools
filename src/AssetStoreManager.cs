@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
@@ -6,60 +6,6 @@ using UnityEngine;
 
 internal class AssetStoreManager : EditorWindow
 {
-	private static class Styles
-	{
-		public static GUIStyle MarginBox;
-
-		public static GUIStyle ToolbarLabel;
-
-		static Styles()
-		{
-			AssetStoreManager.Styles.MarginBox = new GUIStyle();
-			AssetStoreManager.Styles.ToolbarLabel = new GUIStyle("MiniLabel");
-			AssetStoreManager.Styles.MarginBox.padding.top = 5;
-			AssetStoreManager.Styles.MarginBox.padding.right = 15;
-			AssetStoreManager.Styles.MarginBox.padding.bottom = 5;
-			AssetStoreManager.Styles.MarginBox.padding.left = 15;
-			AssetStoreManager.Styles.ToolbarLabel.padding = new RectOffset(0, 1, 2, 0);
-		}
-	}
-
-	private const string windowTitle = "Package Upload";
-
-	internal static bool sDbg;
-
-	internal static bool sDbgButtons;
-
-	private AssetStorePublisher m_AccountConfigure = new AssetStorePublisher();
-
-	private AssetStorePackageController m_PackageController;
-
-	private PackageDataSource m_PackageDataSource = new PackageDataSource();
-
-	private AssetStorePublisher Account
-	{
-		get
-		{
-			if (this.m_AccountConfigure == null)
-			{
-				this.m_AccountConfigure = new AssetStorePublisher();
-			}
-			return this.m_AccountConfigure;
-		}
-	}
-
-	public PackageDataSource packageDataSource
-	{
-		get
-		{
-			return this.m_PackageDataSource;
-		}
-		set
-		{
-			this.m_PackageDataSource = value;
-		}
-	}
-
 	private AssetStoreManager()
 	{
 	}
@@ -122,7 +68,7 @@ internal class AssetStoreManager : EditorWindow
 			}
 			return;
 		}
-		Console.WriteLine("Asset Store Upload Tool logged in. V4.0.7");
+		Console.WriteLine("Asset Store Upload Tool logged in. V4.1.0");
 		AssetStoreManager assetStoreManager2 = (AssetStoreManager)EditorWindow.GetWindow(typeof(AssetStoreManager), false, "Package Upload");
 		assetStoreManager2.Init();
 		assetStoreManager2.Show();
@@ -176,6 +122,30 @@ internal class AssetStoreManager : EditorWindow
 		}
 	}
 
+	private AssetStorePublisher Account
+	{
+		get
+		{
+			if (this.m_AccountConfigure == null)
+			{
+				this.m_AccountConfigure = new AssetStorePublisher();
+			}
+			return this.m_AccountConfigure;
+		}
+	}
+
+	public PackageDataSource packageDataSource
+	{
+		get
+		{
+			return this.m_PackageDataSource;
+		}
+		set
+		{
+			this.m_PackageDataSource = value;
+		}
+	}
+
 	private void OnEnable()
 	{
 		this.m_PackageDataSource = new PackageDataSource();
@@ -226,7 +196,7 @@ internal class AssetStoreManager : EditorWindow
 		GUILayout.BeginHorizontal(new GUILayoutOption[0]);
 		Color color = GUI.color;
 		GUI.color = Color.gray;
-		GUILayout.Label("Version " + "V4.0.7".Substring(1), new GUILayoutOption[0]);
+		GUILayout.Label("Version " + "V4.1.0".Substring(1), new GUILayoutOption[0]);
 		GUI.color = color;
 		GUILayout.FlexibleSpace();
 		if (GUILayout.Button("Close", new GUILayoutOption[]
@@ -252,9 +222,9 @@ internal class AssetStoreManager : EditorWindow
 			{
 				FileSelector.Show("/", new List<string>(), delegate(List<string> newList)
 				{
-					foreach (string current in newList)
+					foreach (string str in newList)
 					{
-						DebugUtils.Log(current);
+						DebugUtils.Log(str);
 					}
 				});
 			}
@@ -356,5 +326,33 @@ internal class AssetStoreManager : EditorWindow
 	private void OnDestroy()
 	{
 		DebugUtils.Log("Ondestroy");
+	}
+
+	private const string windowTitle = "Package Upload";
+
+	internal static bool sDbg;
+
+	internal static bool sDbgButtons;
+
+	private AssetStorePublisher m_AccountConfigure = new AssetStorePublisher();
+
+	private AssetStorePackageController m_PackageController;
+
+	private PackageDataSource m_PackageDataSource = new PackageDataSource();
+
+	private static class Styles
+	{
+		static Styles()
+		{
+			AssetStoreManager.Styles.MarginBox.padding.top = 5;
+			AssetStoreManager.Styles.MarginBox.padding.right = 15;
+			AssetStoreManager.Styles.MarginBox.padding.bottom = 5;
+			AssetStoreManager.Styles.MarginBox.padding.left = 15;
+			AssetStoreManager.Styles.ToolbarLabel.padding = new RectOffset(0, 1, 2, 0);
+		}
+
+		public static GUIStyle MarginBox = new GUIStyle();
+
+		public static GUIStyle ToolbarLabel = new GUIStyle("MiniLabel");
 	}
 }

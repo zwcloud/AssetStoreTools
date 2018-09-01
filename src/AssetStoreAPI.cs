@@ -1,16 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 internal static class AssetStoreAPI
 {
-	public delegate void DoneCallback(string errorMessage);
-
-	public delegate void UploadBundleCallback(string filepath, string errorMessage);
-
-	private const string kBundlePath = "/package/{0}/assetbundle/{1}";
-
-	private const string kUnityPackagePath = "/package/{0}/unitypackage";
-
 	private static bool Parse(AssetStoreResponse response, out string error, out JSONValue jval)
 	{
 		jval = default(JSONValue);
@@ -22,8 +14,8 @@ internal static class AssetStoreAPI
 		}
 		try
 		{
-			JSONParser jSONParser = new JSONParser(response.data);
-			jval = jSONParser.Parse();
+			JSONParser jsonparser = new JSONParser(response.data);
+			jval = jsonparser.Parse();
 		}
 		catch (JSONParseException ex)
 		{
@@ -109,13 +101,11 @@ internal static class AssetStoreAPI
 		}
 		catch (JSONTypeException ex)
 		{
-			string result = "Malformed response from server: " + str + " - " + ex.Message;
-			return result;
+			return "Malformed response from server: " + str + " - " + ex.Message;
 		}
 		catch (KeyNotFoundException ex2)
 		{
-			string result = "Malformed response from server. " + str + " - " + ex2.Message;
-			return result;
+			return "Malformed response from server. " + str + " - " + ex2.Message;
 		}
 		return null;
 	}
@@ -125,10 +115,10 @@ internal static class AssetStoreAPI
 		IList<Package> allPackages = packageDataSource.GetAllPackages();
 		Dictionary<string, JSONValue> dictionary = jv.AsDict(false);
 		string text = string.Empty;
-		foreach (KeyValuePair<string, JSONValue> current in dictionary)
+		foreach (KeyValuePair<string, JSONValue> keyValuePair in dictionary)
 		{
-			int num = int.Parse(current.Key);
-			JSONValue value = current.Value;
+			int num = int.Parse(keyValuePair.Key);
+			JSONValue value = keyValuePair.Value;
 			Package package = packageDataSource.FindByID(num);
 			if (package == null)
 			{
@@ -146,8 +136,8 @@ internal static class AssetStoreAPI
 		AssetStoreClient.Pending pending = AssetStoreClient.CreatePendingUpload(path, path, filepath, delegate(AssetStoreResponse resp)
 		{
 			string errorMessage = null;
-			JSONValue jSONValue;
-			AssetStoreAPI.Parse(resp, out errorMessage, out jSONValue);
+			JSONValue jsonvalue;
+			AssetStoreAPI.Parse(resp, out errorMessage, out jsonvalue);
 			callback(errorMessage);
 		});
 		pending.progressCallback = progress;
@@ -163,8 +153,8 @@ internal static class AssetStoreAPI
 		AssetStoreClient.UploadLargeFile(path, filepath, null, delegate(AssetStoreResponse resp)
 		{
 			string errorMessage = null;
-			JSONValue jSONValue;
-			AssetStoreAPI.Parse(resp, out errorMessage, out jSONValue);
+			JSONValue jsonvalue;
+			AssetStoreAPI.Parse(resp, out errorMessage, out jsonvalue);
 			callback(filepath, errorMessage);
 		}, progress);
 	}
@@ -194,8 +184,8 @@ internal static class AssetStoreAPI
 				return;
 			}
 			string errorMessage = null;
-			JSONValue jSONValue;
-			AssetStoreAPI.Parse(resp, out errorMessage, out jSONValue);
+			JSONValue jsonvalue;
+			AssetStoreAPI.Parse(resp, out errorMessage, out jsonvalue);
 			callback(errorMessage);
 		}, progress);
 	}
@@ -207,8 +197,7 @@ internal static class AssetStoreAPI
 		{
 			if (!jval.ContainsKey("id"))
 			{
-				string result = null;
-				return result;
+				return null;
 			}
 			string empty = string.Empty;
 			string empty2 = string.Empty;
@@ -257,7 +246,7 @@ internal static class AssetStoreAPI
 		}
 		catch (JSONTypeException ex)
 		{
-			string result = string.Concat(new string[]
+			return string.Concat(new string[]
 			{
 				"Malformed metadata response for package '",
 				package.Name,
@@ -266,11 +255,10 @@ internal static class AssetStoreAPI
 				"': ",
 				ex.Message
 			});
-			return result;
 		}
 		catch (KeyNotFoundException ex2)
 		{
-			string result = string.Concat(new string[]
+			return string.Concat(new string[]
 			{
 				"Malformed metadata response for package. '",
 				package.Name,
@@ -279,7 +267,6 @@ internal static class AssetStoreAPI
 				"': ",
 				ex2.Message
 			});
-			return result;
 		}
 		return null;
 	}
@@ -290,21 +277,21 @@ internal static class AssetStoreAPI
 		try
 		{
 			text = "assetbundles";
-			JSONValue jSONValue = jval.Get(text);
-			if (!jSONValue.IsNull())
+			JSONValue jsonvalue = jval.Get(text);
+			if (!jsonvalue.IsNull())
 			{
 				List<string> list = new List<string>();
-				List<JSONValue> list2 = jSONValue.AsList(false);
-				foreach (JSONValue current in list2)
+				List<JSONValue> list2 = jsonvalue.AsList(false);
+				foreach (JSONValue jsonvalue2 in list2)
 				{
-					list.Add(current.AsString(false));
+					list.Add(jsonvalue2.AsString(false));
 				}
 				package.MainAssets = list;
 			}
 		}
 		catch (JSONTypeException ex)
 		{
-			string result = string.Concat(new string[]
+			return string.Concat(new string[]
 			{
 				"Malformed metadata response for mainAssets '",
 				package.Name,
@@ -313,11 +300,10 @@ internal static class AssetStoreAPI
 				"': ",
 				ex.Message
 			});
-			return result;
 		}
 		catch (KeyNotFoundException ex2)
 		{
-			string result = string.Concat(new string[]
+			return string.Concat(new string[]
 			{
 				"Malformed metadata response for package. '",
 				package.Name,
@@ -326,8 +312,15 @@ internal static class AssetStoreAPI
 				"': ",
 				ex2.Message
 			});
-			return result;
 		}
 		return null;
 	}
+
+	private const string kBundlePath = "/package/{0}/assetbundle/{1}";
+
+	private const string kUnityPackagePath = "/package/{0}/unitypackage";
+
+	public delegate void DoneCallback(string errorMessage);
+
+	public delegate void UploadBundleCallback(string filepath, string errorMessage);
 }
