@@ -1,29 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 
 internal class JSONParser
 {
-	private string json;
-
-	private int line;
-
-	private int linechar;
-
-	private int len;
-
-	private int idx;
-
-	private int pctParsed;
-
-	private char cur;
-
-	private static char[] endcodes = new char[]
-	{
-		'\\',
-		'"'
-	};
-
 	public JSONParser(string jsondata)
 	{
 		this.json = jsondata + "    ";
@@ -36,10 +16,10 @@ internal class JSONParser
 
 	public static JSONValue SimpleParse(string jsondata)
 	{
-		JSONParser jSONParser = new JSONParser(jsondata);
+		JSONParser jsonparser = new JSONParser(jsondata);
 		try
 		{
-			return jSONParser.Parse();
+			return jsonparser.Parse();
 		}
 		catch (JSONParseException ex)
 		{
@@ -153,8 +133,8 @@ internal class JSONParser
 		Dictionary<string, JSONValue> dictionary = new Dictionary<string, JSONValue>();
 		while (this.cur != '}')
 		{
-			JSONValue jSONValue = this.ParseValue();
-			if (!jSONValue.IsString())
+			JSONValue jsonvalue = this.ParseValue();
+			if (!jsonvalue.IsString())
 			{
 				throw new JSONParseException("Key not string type at " + this.PosMsg());
 			}
@@ -164,7 +144,7 @@ internal class JSONParser
 				throw new JSONParseException("Missing dict entry delimiter ':' at " + this.PosMsg());
 			}
 			this.Next();
-			dictionary.Add(jSONValue.AsString(false), this.ParseValue());
+			dictionary.Add(jsonvalue.AsString(false), this.ParseValue());
 			this.SkipWs();
 			if (this.cur == ',')
 			{
@@ -205,12 +185,8 @@ internal class JSONParser
 			{
 			case 'n':
 				text += '\n';
-				goto IL_2AE;
-			case 'o':
-			case 'p':
-			case 'q':
-			case 's':
-				IL_F7:
+				break;
+			default:
 				if (c2 != '"')
 				{
 					if (c2 != '/')
@@ -220,7 +196,7 @@ internal class JSONParser
 							if (c2 == 'b')
 							{
 								text += '\b';
-								goto IL_2AE;
+								break;
 							}
 							if (c2 != 'f')
 							{
@@ -233,18 +209,18 @@ internal class JSONParser
 								}));
 							}
 							text += '\f';
-							goto IL_2AE;
+							break;
 						}
 					}
 				}
 				text += c;
-				goto IL_2AE;
+				break;
 			case 'r':
 				text += '\r';
-				goto IL_2AE;
+				break;
 			case 't':
 				text += '\t';
-				goto IL_2AE;
+				break;
 			case 'u':
 			{
 				string text2 = string.Empty;
@@ -266,10 +242,9 @@ internal class JSONParser
 					throw new JSONParseException("Invalid unicode escape char near " + this.PosMsg());
 				}
 				num += 4;
-				goto IL_2AE;
+				break;
 			}
 			}
-			IL_2AE:
 			this.idx = num + 1;
 		}
 		if (this.idx >= this.len)
@@ -365,4 +340,24 @@ internal class JSONParser
 		}
 		throw new JSONParseException("Invalid token at " + this.PosMsg());
 	}
+
+	private string json;
+
+	private int line;
+
+	private int linechar;
+
+	private int len;
+
+	private int idx;
+
+	private int pctParsed;
+
+	private char cur;
+
+	private static char[] endcodes = new char[]
+	{
+		'\\',
+		'"'
+	};
 }

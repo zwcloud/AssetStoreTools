@@ -1,17 +1,9 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 internal class Image
 {
-	public string mUrl;
-
-	public ImageCache mImgCache;
-
-	public string Name
-	{
-		get;
-		set;
-	}
+	public string Name { get; set; }
 
 	public Texture2D Texture
 	{
@@ -36,4 +28,8 @@ internal class Image
 			return this.Texture;
 		}
 	}
+
+	public string mUrl;
+
+	public ImageCache mImgCache;
 }

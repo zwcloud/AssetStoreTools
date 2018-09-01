@@ -1,7 +1,4 @@
-using System;
-using UnityEngine;
-
-public interface IAssetBundler
+﻿public interface IAssetBundler
 {
 	bool CanPreview();
 

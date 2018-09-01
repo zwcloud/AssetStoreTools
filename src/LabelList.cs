@@ -1,13 +1,10 @@
-using System;
+﻿using System;
 using UnityEditor;
 using UnityEngine;
 
 [Serializable]
 internal class LabelList : ScriptableObject
 {
-	[HideInInspector]
-	public string[] m_Labels = new string[0];
-
 	public int Count
 	{
 		get
@@ -61,4 +58,7 @@ internal class LabelList : ScriptableObject
 		EditorUtility.SetDirty(this);
 		return true;
 	}
+
+	[HideInInspector]
+	public string[] m_Labels = new string[0];
 }

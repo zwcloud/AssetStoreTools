@@ -1,37 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 internal class ImageCache
 {
-	public delegate void DownloadCallback(Image img, ImageCache imgcache, string errorMessage);
+	public Texture2D Texture { get; set; }
 
-	private const float k_FadeTime = 0.7f;
+	public double LastUsed { get; set; }
 
-	private const int kImageCacheSize = 103;
-
-	private double m_DownloadedAt;
-
-	private static Dictionary<string, ImageCache> s_EntriesByUrl;
-
-	public Texture2D Texture
-	{
-		get;
-		set;
-	}
-
-	public double LastUsed
-	{
-		get;
-		set;
-	}
-
-	public float Progress
-	{
-		get;
-		set;
-	}
+	public float Progress { get; set; }
 
 	public float FadeAlpha
 	{
@@ -41,11 +19,7 @@ internal class ImageCache
 		}
 	}
 
-	public bool Failed
-	{
-		get;
-		private set;
-	}
+	public bool Failed { get; private set; }
 
 	public static int MaxCacheSize
 	{
@@ -148,15 +122,25 @@ internal class ImageCache
 		{
 			string key = null;
 			double num = EditorApplication.timeSinceStartup;
-			foreach (KeyValuePair<string, ImageCache> current in ImageCache.EntriesByUrl)
+			foreach (KeyValuePair<string, ImageCache> keyValuePair in ImageCache.EntriesByUrl)
 			{
-				if (current.Value.LastUsed < num)
+				if (keyValuePair.Value.LastUsed < num)
 				{
-					key = current.Key;
-					num = current.Value.LastUsed;
+					key = keyValuePair.Key;
+					num = keyValuePair.Value.LastUsed;
 				}
 			}
 			ImageCache.EntriesByUrl.Remove(key);
 		}
 	}
+
+	private const float k_FadeTime = 0.7f;
+
+	private const int kImageCacheSize = 103;
+
+	private double m_DownloadedAt;
+
+	private static Dictionary<string, ImageCache> s_EntriesByUrl;
+
+	public delegate void DownloadCallback(Image img, ImageCache imgcache, string errorMessage);
 }

@@ -1,26 +1,20 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 internal class ListView<T>
 {
-	public delegate void SelectionCallback(T selected);
+	public ListView(IDataSource<T> dataSource, IListViewGUI<T> gui)
+	{
+		this.m_DataSource = dataSource;
+		this.m_GUI = gui;
+	}
 
-	protected IDataSource<T> m_DataSource;
-
-	protected IListViewGUI<T> m_GUI;
-
-	protected int m_KeyboardControlID = -1;
-
-	protected Vector2 m_ScrollPosition = default(Vector2);
-
-	protected Rect m_ScrollWindow = default(Rect);
-
-	protected T m_Selected = default(T);
-
-	protected ListView<T>.SelectionCallback m_SelectionConfirmCallback;
-
-	protected ListView<T>.SelectionCallback m_SelectionChangeCallback;
+	public ListView(IDataSource<T> dataSource, IListViewGUI<T> gui, ListView<T>.SelectionCallback selectionChangeCallback, ListView<T>.SelectionCallback selectionConfirmCallback) : this(dataSource, gui)
+	{
+		this.m_SelectionConfirmCallback = selectionConfirmCallback;
+		this.m_SelectionChangeCallback = selectionChangeCallback;
+	}
 
 	public T Selected
 	{
@@ -36,18 +30,6 @@ internal class ListView<T>
 				this.EnsureSelectionIsInView();
 			}
 		}
-	}
-
-	public ListView(IDataSource<T> dataSource, IListViewGUI<T> gui)
-	{
-		this.m_DataSource = dataSource;
-		this.m_GUI = gui;
-	}
-
-	public ListView(IDataSource<T> dataSource, IListViewGUI<T> gui, ListView<T>.SelectionCallback selectionChangeCallback, ListView<T>.SelectionCallback selectionConfirmCallback) : this(dataSource, gui)
-	{
-		this.m_SelectionConfirmCallback = selectionConfirmCallback;
-		this.m_SelectionChangeCallback = selectionChangeCallback;
 	}
 
 	protected void OffsetSelection(int delta)
@@ -206,4 +188,22 @@ internal class ListView<T>
 			}
 		}
 	}
+
+	protected IDataSource<T> m_DataSource;
+
+	protected IListViewGUI<T> m_GUI;
+
+	protected int m_KeyboardControlID = -1;
+
+	protected Vector2 m_ScrollPosition = default(Vector2);
+
+	protected Rect m_ScrollWindow = default(Rect);
+
+	protected T m_Selected = default(T);
+
+	protected ListView<T>.SelectionCallback m_SelectionConfirmCallback;
+
+	protected ListView<T>.SelectionCallback m_SelectionChangeCallback;
+
+	public delegate void SelectionCallback(T selected);
 }

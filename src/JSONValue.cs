@@ -1,28 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 internal struct JSONValue
 {
-	private object data;
-
-	public JSONValue this[string index]
-	{
-		get
-		{
-			Dictionary<string, JSONValue> dictionary = this.AsDict(false);
-			return dictionary[index];
-		}
-		set
-		{
-			if (this.data == null)
-			{
-				this.data = new Dictionary<string, JSONValue>();
-			}
-			Dictionary<string, JSONValue> dictionary = this.AsDict(false);
-			dictionary[index] = value;
-		}
-	}
-
 	public JSONValue(object o)
 	{
 		this.data = o;
@@ -165,6 +145,24 @@ internal struct JSONValue
 		return this;
 	}
 
+	public JSONValue this[string index]
+	{
+		get
+		{
+			Dictionary<string, JSONValue> dictionary = this.AsDict(false);
+			return dictionary[index];
+		}
+		set
+		{
+			if (this.data == null)
+			{
+				this.data = new Dictionary<string, JSONValue>();
+			}
+			Dictionary<string, JSONValue> dictionary = this.AsDict(false);
+			dictionary[index] = value;
+		}
+	}
+
 	public bool ContainsKey(string index)
 	{
 		return this.IsDict() && this.AsDict(false).ContainsKey(index);
@@ -178,13 +176,11 @@ internal struct JSONValue
 			return new JSONValue(null);
 		}
 		JSONValue result = this;
-		string[] array = key.Split(new char[]
+		foreach (string index in key.Split(new char[]
 		{
 			'.'
-		});
-		for (int i = 0; i < array.Length; i++)
+		}))
 		{
-			string index = array[i];
 			if (!result.ContainsKey(index))
 			{
 				return new JSONValue(null);
@@ -209,10 +205,10 @@ internal struct JSONValue
 	public bool Copy(string key, ref string dest, bool allowCopyNull)
 	{
 		bool flag;
-		JSONValue jSONValue = this.Get(key, out flag);
-		if (flag && (!jSONValue.IsNull() || allowCopyNull))
+		JSONValue jsonvalue = this.Get(key, out flag);
+		if (flag && (!jsonvalue.IsNull() || allowCopyNull))
 		{
-			dest = ((!jSONValue.IsNull()) ? jSONValue.AsString(false) : null);
+			dest = ((!jsonvalue.IsNull()) ? jsonvalue.AsString(false) : null);
 		}
 		return flag;
 	}
@@ -220,10 +216,10 @@ internal struct JSONValue
 	public bool Copy(string key, ref bool dest)
 	{
 		bool flag;
-		JSONValue jSONValue = this.Get(key, out flag);
-		if (flag && !jSONValue.IsNull())
+		JSONValue jsonvalue = this.Get(key, out flag);
+		if (flag && !jsonvalue.IsNull())
 		{
-			dest = jSONValue.AsBool(false);
+			dest = jsonvalue.AsBool(false);
 		}
 		return flag;
 	}
@@ -231,10 +227,10 @@ internal struct JSONValue
 	public bool Copy(string key, ref int dest)
 	{
 		bool flag;
-		JSONValue jSONValue = this.Get(key, out flag);
-		if (flag && !jSONValue.IsNull())
+		JSONValue jsonvalue = this.Get(key, out flag);
+		if (flag && !jsonvalue.IsNull())
 		{
-			dest = (int)jSONValue.AsFloat(false);
+			dest = (int)jsonvalue.AsFloat(false);
 		}
 		return flag;
 	}
@@ -311,9 +307,9 @@ internal struct JSONValue
 		{
 			string str = "[";
 			string str2 = string.Empty;
-			foreach (JSONValue current in this.AsList(false))
+			foreach (JSONValue jsonvalue in this.AsList(false))
 			{
-				str = str + str2 + current.ToString();
+				str = str + str2 + jsonvalue.ToString();
 				str2 = ", ";
 			}
 			return str + "]";
@@ -322,7 +318,7 @@ internal struct JSONValue
 		{
 			string text = "{" + ((!flag) ? string.Empty : "\n");
 			string text2 = string.Empty;
-			foreach (KeyValuePair<string, JSONValue> current2 in this.AsDict(false))
+			foreach (KeyValuePair<string, JSONValue> keyValuePair in this.AsDict(false))
 			{
 				string text3 = text;
 				text = string.Concat(new object[]
@@ -332,9 +328,9 @@ internal struct JSONValue
 					curIndent,
 					indent,
 					'"',
-					JSONValue.EncodeString(current2.Key),
+					JSONValue.EncodeString(keyValuePair.Key),
 					"\" : ",
-					current2.Value.ToString(curIndent + indent, indent)
+					keyValuePair.Value.ToString(curIndent + indent, indent)
 				});
 				text2 = ", " + ((!flag) ? string.Empty : "\n");
 			}
@@ -418,4 +414,6 @@ internal struct JSONValue
 	{
 		return s.AsDict(false);
 	}
+
+	private object data;
 }
