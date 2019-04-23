@@ -1,8 +1,12 @@
 ﻿using System;
 
-internal class JSONParseException : Exception
+namespace AssetStoreTools
 {
-	public JSONParseException(string msg) : base(msg)
-	{
-	}
+    internal class JSONParseException : Exception
+    {
+        public JSONParseException(string msg) : base(msg)
+        {
+        }
+    }
+
 }

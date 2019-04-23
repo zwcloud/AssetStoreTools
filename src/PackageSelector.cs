@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
+namespace AssetStoreTools
+{
 internal class PackageSelector
 {
 	public PackageSelector(PackageDataSource pkgDataSource, ListView<Package>.SelectionCallback selectionCallback)
@@ -133,4 +135,6 @@ internal class PackageSelector
 
 		internal GUIStyle ListNodeTextField = new GUIStyle("PR Label");
 	}
+}
+
 }

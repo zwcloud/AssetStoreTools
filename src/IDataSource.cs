@@ -1,7 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-internal interface IDataSource<T>
+namespace AssetStoreTools
 {
-	IList<T> GetVisibleRows();
+    internal interface IDataSource<T>
+    {
+        IList<T> GetVisibleRows();
+    }
+
 }
