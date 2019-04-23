@@ -937,8 +937,14 @@ namespace AssetStoreTools
                     if (p.progressCallback != null && p.statsUpdated)
                     {
                         p.statsUpdated = false;
-                        double pctUp = p.bytesSend / p.totalBytesToSend * 100.0;
-                        double pctDown = p.bytesReceived / p.totalBytesToReceive * 100.0;
+                        double pctUp = (p.totalBytesToSend <= 0) 
+                            ? 0 
+                            : p.bytesSend / p.totalBytesToSend * 100.0;
+
+                        double pctDown = (p.totalBytesToReceive <= 0)
+                            ? 0
+                            : p.bytesReceived / p.totalBytesToReceive * 100.0;
+
                         try
                         {
                             p.progressCallback(pctUp, pctDown);
