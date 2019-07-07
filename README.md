@@ -11,3 +11,4 @@ See [releases](https://github.com/zwcloud/AssetStoreTools/releases).
 * two buttons to expand / collapse all folders (by JeReT)
     ![gif animation illustrating the improvement](Doc/Img/improvement.gif)
 * Complete uploading when first progress bar reaches 100%. So Unity no longer crashes/freezes after that.
+* Don't close the window after finished uploading the package, so we can upload another package without being interrupted.
