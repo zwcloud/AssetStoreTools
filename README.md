@@ -1,5 +1,5 @@
 # AssetStoreTools
-An improved version of the offical Unity3D asset store tools.
+An improved version of [the offical Unity3D asset store tools](https://assetstore.unity.com/packages/unity/asset-store-tools-115).
 
 # Usage
 
