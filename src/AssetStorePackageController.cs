@@ -521,9 +521,6 @@ namespace AssetStoreTools
         {
             EditorUtility.DisplayDialog("Upload successful", "The package has been uploaded please visit the Publisher Administration to submit this version for review.", "Ok");
             this.ClearLocalState();
-            DebugUtils.Log("Closing package manager after successful submission");
-            AssetStoreManager assetStoreManager = (AssetStoreManager)EditorWindow.GetWindow(typeof(AssetStoreManager), false, "AssetStoreMgr");
-            assetStoreManager.Close();
         }
 
         public void Update()

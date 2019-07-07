@@ -17,7 +17,7 @@ namespace AssetStoreTools
         [MenuItem("Asset Store Tools/Package Upload", false, 0)]
         private static void Launch()
         {
-#if !UNITY_2017 && !UNITY_2018
+#if !UNITY_2017 && !UNITY_2018 && !UNITY_2019
             if (Application.webSecurityEnabled)
             {
                 bool flag = EditorUtility.DisplayDialog("Web player platform active", "You are currently using the Web Player platform. To upload Asset Store packages please switch platform to PC and Mac standalone in File -> Build Settings...", "Switch my Active Platform.", "Cancel");
