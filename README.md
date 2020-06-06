@@ -1,6 +1,8 @@
 # AssetStoreTools
 An improved version of [the offical Unity3D asset store tools](https://assetstore.unity.com/packages/unity/asset-store-tools-115).
 
+The latest release is compatible with Unity 5.6.6, 2017.3, 2017.4, 2018.3, 2018.4, 2019.1, 2019.2, 2019.3 and 2020.1.
+
 # Usage
 
 See [releases](https://github.com/zwcloud/AssetStoreTools/releases).
