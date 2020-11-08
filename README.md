@@ -1,3 +1,7 @@
+# :warning: This repo has been Deprecated
+
+Because lastest official [Asset Store Tools](https://assetstore.unity.com/packages/unity/asset-store-tools-115) has been greatly improved since version 5.0.4, many of the annoying issues have been fixed. Please use the offical Asset Store Tools instead.
+
 # AssetStoreTools
 An improved version of [the offical Unity3D asset store tools](https://assetstore.unity.com/packages/unity/asset-store-tools-115).
 
