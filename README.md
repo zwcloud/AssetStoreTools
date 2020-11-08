@@ -2,6 +2,8 @@
 
 Because lastest official [Asset Store Tools](https://assetstore.unity.com/packages/unity/asset-store-tools-115) has been greatly improved since version 5.0.4, many of the annoying issues have been fixed. Please use the offical Asset Store Tools instead.
 
+But if the offical one is buggy again in the future, this repo will be re-opened.
+
 # AssetStoreTools
 An improved version of [the offical Unity3D asset store tools](https://assetstore.unity.com/packages/unity/asset-store-tools-115).
 
