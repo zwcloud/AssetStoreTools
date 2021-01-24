@@ -1,9 +1,3 @@
-# :warning: This repo has been Deprecated
-
-Because lastest official [Asset Store Tools](https://assetstore.unity.com/packages/unity/asset-store-tools-115) has been greatly improved since version 5.0.4, many of the annoying issues have been fixed. Please use the offical Asset Store Tools instead.
-
-But if the offical one is buggy again in the future, this repo will be re-opened.
-
 # AssetStoreTools
 An improved version of [the offical Unity3D asset store tools](https://assetstore.unity.com/packages/unity/asset-store-tools-115).
 
@@ -20,3 +14,11 @@ See [releases](https://github.com/zwcloud/AssetStoreTools/releases).
     ![gif animation illustrating the improvement](Doc/Img/improvement.gif)
 * Complete uploading when first progress bar reaches 100%. So Unity no longer crashes/freezes after that.
 * Don't close the window after finished uploading the package, so we can upload another package without being interrupted.
+
+# History
+
+2021-01-24 Latest offical Asset Store Tools [breaks again on 2020.2](https://forum.unity.com/threads/issue-asset-store-tools-not-working-in-2020-2.1023478), re-opened this repo.
+
+2020-07-28 Latest offical [Asset Store Tools](https://assetstore.unity.com/packages/unity/asset-store-tools-115) has been greatly improved since version 5.0.4, many of the annoying issues have been fixed. Archived this repo
+
+2017-01-24 As a plugin publisher, I found the official Asset Store Tool very annoying to use in many aspects. So I just decided to decompile it and fixed most issues I found, together with @JeReT.
