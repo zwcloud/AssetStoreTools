@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
 
-public interface IAssetBundler
+namespace AssetStoreTools
 {
-	bool CanPreview();
+    public interface IAssetBundler
+    {
+        bool CanPreview();
 
-	bool CanGenerateBundles();
+        bool CanGenerateBundles();
 
-	bool CreateBundle(Object asset, string targetPath);
+        bool CreateBundle(Object asset, string targetPath);
 
-	void Preview(string assetpath);
+        void Preview(string assetpath);
+    }
+
 }

@@ -1,24 +1,28 @@
 ﻿using System.Net;
 
-internal struct AssetStoreResponse
+namespace AssetStoreTools
 {
-	public bool failed
-	{
-		get
-		{
-			return !this.ok;
-		}
-	}
+    internal struct AssetStoreResponse
+    {
+        public bool failed
+        {
+            get
+            {
+                return !this.ok;
+            }
+        }
 
-	public int HttpStatusCode;
+        public int HttpStatusCode;
 
-	public string HttpErrorMessage;
+        public string HttpErrorMessage;
 
-	public WebHeaderCollection HttpHeaders;
+        public WebHeaderCollection HttpHeaders;
 
-	public string data;
+        public string data;
 
-	public byte[] binData;
+        public byte[] binData;
 
-	public bool ok;
+        public bool ok;
+    }
+
 }

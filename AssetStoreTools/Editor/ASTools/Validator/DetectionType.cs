@@ -1,10 +1,10 @@
 ﻿
 namespace ASTools.Validator
 {
-	public enum DetectionType
-	{
-		ErrorOnDetect,
-		WarningOnDetect,
-		ErrorOnAbsence
-	}
+    public enum DetectionType
+    {
+        ErrorOnDetect,
+        WarningOnDetect,
+        ErrorOnAbsence
+    }
 }

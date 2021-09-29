@@ -1,34 +1,38 @@
 ﻿using UnityEngine;
 
-internal class Image
+namespace AssetStoreTools
 {
-	public string Name { get; set; }
+    internal class Image
+    {
+        public string Name { get; set; }
 
-	public Texture2D Texture
-	{
-		get
-		{
-			if (this.mImgCache == null)
-			{
-				return null;
-			}
-			if (this.mImgCache.Texture == null)
-			{
-				return GUIUtil.StatusWheel.image as Texture2D;
-			}
-			return this.mImgCache.Texture;
-		}
-	}
+        public Texture2D Texture
+        {
+            get
+            {
+                if (this.mImgCache == null)
+                {
+                    return null;
+                }
+                if (this.mImgCache.Texture == null)
+                {
+                    return GUIUtil.StatusWheel.image as Texture2D;
+                }
+                return this.mImgCache.Texture;
+            }
+        }
 
-	public Texture2D Icon
-	{
-		get
-		{
-			return this.Texture;
-		}
-	}
+        public Texture2D Icon
+        {
+            get
+            {
+                return this.Texture;
+            }
+        }
 
-	public string mUrl;
+        public string mUrl;
 
-	public ImageCache mImgCache;
+        public ImageCache mImgCache;
+    }
+
 }
