@@ -1,8 +1,12 @@
 ﻿
-public static class AssetBundlerFactory
+namespace AssetStoreTools
 {
-	public static IAssetBundler GetBundler()
-	{
-		return new AssetBundler4();
-	}
+    public static class AssetBundlerFactory
+    {
+        public static IAssetBundler GetBundler()
+        {
+            return new AssetBundler4();
+        }
+    }
+
 }

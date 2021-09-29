@@ -1,17 +1,21 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-internal interface IListViewGUI<T>
+namespace AssetStoreTools
 {
-	Rect OnRowGUI(T node, Vector2 contentSize, bool selected, bool focus);
+    internal interface IListViewGUI<T>
+    {
+        Rect OnRowGUI(T node, Vector2 contentSize, bool selected, bool focus);
 
-	void BeginRowsGUI();
+        void BeginRowsGUI();
 
-	void EndRowsGUI();
+        void EndRowsGUI();
 
-	Vector2 GetTopLeftNodePixel(int index, IList<T> visibleRows);
+        Vector2 GetTopLeftNodePixel(int index, IList<T> visibleRows);
 
-	Vector2 GetNodeArea(T node);
+        Vector2 GetNodeArea(T node);
 
-	Vector2 GetTotalSize(IList<T> visibleRows, Vector2 displayArea);
+        Vector2 GetTotalSize(IList<T> visibleRows, Vector2 displayArea);
+    }
+
 }

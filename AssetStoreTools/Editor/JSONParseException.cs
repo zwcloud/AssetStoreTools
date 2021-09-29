@@ -1,7 +1,11 @@
 ﻿
-internal class JSONParseException : System.Exception
+namespace AssetStoreTools
 {
-	public JSONParseException(string msg) : base(msg)
-	{
-	}
+    internal class JSONParseException : System.Exception
+    {
+        public JSONParseException(string msg) : base(msg)
+        {
+        }
+    }
+
 }
